@@ -102,19 +102,11 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
-    // Conversation list active state
-    document.querySelectorAll('.conv-item').forEach(item => {
-        item.addEventListener('click', function() {
-            document.querySelectorAll('.conv-item').forEach(i => i.classList.remove('active'));
-            this.classList.add('active');
-        });
-    });
-
-    // Sidebar rail active state
-    document.querySelectorAll('.rail-icon').forEach(icon => {
-        icon.addEventListener('click', function(e) {
+    // Main sidebar active state
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function(e) {
             e.preventDefault();
-            document.querySelectorAll('.rail-icon').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             this.classList.add('active');
         });
     });

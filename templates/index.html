@@ -8,109 +8,60 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}?v=1.1">
 </head>
 <body>
     <div class="app-shell">
 
-        <!-- ═══ ICON RAIL (narrow left strip) ═══ -->
-        <nav class="icon-rail">
-            <div class="rail-top">
-                <a href="#" class="rail-brand" title="AI Scheduler">
-                    <i class="fa-solid fa-calendar-check"></i>
+        <!-- ═══ MAIN SIDEBAR ═══ -->
+        <aside class="main-sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">
+                    <div class="brand-icon">
+                        <i class="fa-regular fa-calendar-check"></i>
+                    </div>
+                    <span class="brand-text">Schedule.AI</span>
                 </a>
-                <a href="#" class="rail-icon active" title="Dashboard"><i class="fa-solid fa-message"></i></a>
-                <a href="#" class="rail-icon" title="Meetings"><i class="fa-regular fa-calendar-days"></i></a>
-                <a href="#" class="rail-icon" title="Contacts"><i class="fa-regular fa-address-book"></i></a>
-                <a href="#" class="rail-icon" title="Analytics"><i class="fa-solid fa-chart-simple"></i></a>
-            </div>
-            <div class="rail-bottom">
-                <a href="#" class="rail-icon" title="Settings"><i class="fa-solid fa-gear"></i></a>
-                <a href="#" class="rail-icon" title="Help"><i class="fa-regular fa-circle-question"></i></a>
-                <div class="rail-avatar" title="John Doe">
-                    <img src="https://i.pravatar.cc/150?img=11" alt="John Doe">
-                    <span class="online-dot"></span>
-                </div>
-            </div>
-        </nav>
-
-        <!-- ═══ CONVERSATION LIST PANEL ═══ -->
-        <aside class="conv-list">
-            <div class="conv-list-header">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <h6 class="fw-bold m-0 text-dark"><i class="fa-solid fa-inbox me-2 text-primary"></i>Conversations</h6>
-                    <div class="d-flex gap-1">
-                        <button class="icon-btn" title="Filter"><i class="fa-solid fa-sliders"></i></button>
-                        <button class="icon-btn" title="New Chat"><i class="fa-solid fa-pen-to-square"></i></button>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center gap-2 mb-3">
-                    <span class="filter-pill active">4 Open <i class="fa-solid fa-chevron-down ms-1" style="font-size: 0.6rem;"></i></span>
-                    <span class="filter-pill">Newest <i class="fa-solid fa-chevron-down ms-1" style="font-size: 0.6rem;"></i></span>
-                </div>
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search conversations...">
-                </div>
             </div>
 
-            <div class="conv-items">
-                <!-- Active conversation -->
-                <div class="conv-item active">
-                    <div class="conv-avatar bg-indigo">
-                        <i class="fa-solid fa-sparkles"></i>
-                    </div>
-                    <div class="conv-info">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <span class="conv-name">AI Scheduler</span>
-                            <span class="conv-time">4m</span>
-                        </div>
-                        <span class="conv-preview">Hello John! 👋 I'm your AI...</span>
-                    </div>
-                </div>
+            <div class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-regular fa-calendar"></i>
+                    <span>Calendar</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-solid fa-user-group"></i>
+                    <span>Participants</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-regular fa-lightbulb"></i>
+                    <span>AI Insights</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>Activity Logs</span>
+                </a>
+            </div>
 
-                <div class="conv-item">
-                    <div class="conv-avatar bg-amber">E</div>
-                    <div class="conv-info">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <span class="conv-name">Emma Watson</span>
-                            <span class="conv-time text-primary fw-bold"><i class="fa-solid fa-star me-1" style="font-size: 0.55rem;"></i>3m</span>
-                        </div>
-                        <span class="conv-preview">Re: Q4 Marketing sync...</span>
-                    </div>
-                    <span class="conv-badge">1</span>
+            <div class="sidebar-footer">
+                <div class="sidebar-nav">
+                    <a href="#" class="nav-item">
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Settings</span>
+                    </a>
                 </div>
-
-                <div class="conv-item">
-                    <div class="conv-avatar bg-teal">D</div>
-                    <div class="conv-info">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <span class="conv-name">David Chen</span>
-                            <span class="conv-time">8m</span>
-                        </div>
-                        <span class="conv-preview">Good afternoon, let's reschedu...</span>
+                
+                <div class="user-profile-card">
+                    <div class="user-avatar-lg">
+                        <i class="fa-solid fa-user"></i>
                     </div>
-                </div>
-
-                <div class="conv-item">
-                    <div class="conv-avatar bg-rose">S</div>
-                    <div class="conv-info">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <span class="conv-name">Sarah Miller</span>
-                            <span class="conv-time">17m</span>
-                        </div>
-                        <span class="conv-preview">#8743 — Product Sync update...</span>
-                    </div>
-                </div>
-
-                <div class="conv-item">
-                    <div class="conv-avatar bg-slate">A</div>
-                    <div class="conv-info">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <span class="conv-name">Alex Thomas</span>
-                            <span class="conv-time">23m</span>
-                        </div>
-                        <span class="conv-preview">Yes, it will be processed...</span>
+                    <div class="user-info">
+                        <span class="user-name">Alex Johnson</span>
+                        <span class="user-plan">Pro Account</span>
                     </div>
                 </div>
             </div>
