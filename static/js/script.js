@@ -102,12 +102,13 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
-    // Main sidebar active state
+    // Main sidebar active state is now mostly handled via Jinja classes.
+    // However, we don't prevent navigation anymore.
     document.querySelectorAll('.nav-item').forEach(item => {
         item.addEventListener('click', function(e) {
-            e.preventDefault();
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            this.classList.add('active');
+            // e.preventDefault();
+            // Server-Side template mapping will assign the proper "active" class upon reload.
+            // If they are hash links (#), default click still applies.
         });
     });
 });

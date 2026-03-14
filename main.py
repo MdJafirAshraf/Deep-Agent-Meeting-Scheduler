@@ -135,7 +135,23 @@ def generate_ai_response(user_message: str) -> str:
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request):
     """Serve the main dashboard page."""
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("index.html", {"request": request, "active_page": "assistant"})
+
+@app.get("/meetings", response_class=HTMLResponse)
+async def meetings_page(request: Request):
+    return templates.TemplateResponse("meetings.html", {"request": request, "active_page": "meetings"})
+
+@app.get("/calendar", response_class=HTMLResponse)
+async def calendar_page(request: Request):
+    return templates.TemplateResponse("calendar.html", {"request": request, "active_page": "calendar"})
+
+@app.get("/contacts", response_class=HTMLResponse)
+async def contacts_page(request: Request):
+    return templates.TemplateResponse("contacts.html", {"request": request, "active_page": "contacts"})
+
+@app.get("/activity_logs", response_class=HTMLResponse)
+async def activity_logs_page(request: Request):
+    return templates.TemplateResponse("activity_logs.html", {"request": request, "active_page": "activity_logs"})
 
 
 @app.post("/api/chat")
