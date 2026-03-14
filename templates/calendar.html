@@ -2,21 +2,364 @@
 
 {% block title %}Calendar - AI Meeting Scheduler{% endblock %}
 
+{% block head %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<style>
+/* FullCalendar Customizations to Match Premium SaaS UI */
+.fc {
+    font-family: 'Inter', sans-serif;
+    color: var(--slate-800);
+}
+
+.fc-toolbar-title {
+    font-size: 1.25rem !important;
+    font-weight: 800 !important;
+    color: var(--slate-900);
+}
+
+.fc-button {
+    background-color: var(--white) !important;
+    border: 1px solid var(--slate-200) !important;
+    color: var(--slate-600) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    text-transform: capitalize !important;
+    padding: 0.4rem 1rem !important;
+    transition: all 0.2s;
+    border-radius: 6px !important;
+}
+
+.fc-button:hover {
+    background-color: var(--slate-50) !important;
+    color: var(--slate-900) !important;
+}
+
+.fc-button-active {
+    background-color: var(--slate-100) !important;
+    color: var(--slate-900) !important;
+    border-color: var(--slate-300) !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.04) !important;
+}
+
+.fc-today-button {
+    border-radius: 20px !important;
+    padding: 0.4rem 1.2rem !important;
+    margin-right: 1.5rem !important;
+}
+
+.fc-button-group > .fc-button {
+    border-radius: 0 !important;
+}
+.fc-button-group > .fc-button:first-child {
+    border-top-left-radius: 6px !important;
+    border-bottom-left-radius: 6px !important;
+}
+.fc-button-group > .fc-button:last-child {
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+}
+
+table.fc-scrollgrid {
+    border: none !important;
+}
+.fc-scrollgrid td, .fc-scrollgrid th {
+    border-color: var(--slate-100) !important;
+}
+.fc-theme-standard th {
+    border: none !important;
+    border-bottom: 1px solid var(--slate-200) !important;
+    padding: 14px 0 !important;
+    background-color: var(--white) !important;
+}
+
+.fc-col-header-cell-cushion {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--slate-500);
+    text-transform: uppercase;
+    text-decoration: none !important;
+    letter-spacing: 0.5px;
+}
+.fc-col-header-cell.fc-day-today .fc-col-header-cell-cushion {
+    color: #4f46e5;
+}
+
+.fc-timegrid-slot-label-cushion {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--slate-400);
+}
+
+.fc-timegrid-slot {
+    height: 3.5em !important; /* expand slots for breathing room */
+}
+.fc-timegrid-axis {
+    border-right: 1px solid transparent !important;
+}
+
+/* Base Event styles */
+.fc-event {
+    border: none !important;
+    border-radius: 4px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    background: transparent !important;
+}
+.fc-event:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08) !important;
+    z-index: 5 !important;
+}
+
+.fc-timegrid-event {
+    margin: 1px 2px !important;
+}
+
+/* Event color palettes */
+.bg-purple-subtle { background-color: #f3e8ff !important; color: #7e22ce !important; }
+.bg-blue-subtle { background-color: #e0f2fe !important; color: #0369a1 !important; }
+.bg-green-subtle { background-color: #dcfce7 !important; color: #15803d !important; }
+
+/* Filter Tabs */
+.filter-tab {
+    padding-bottom: 12px;
+    margin-bottom: -1px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: var(--slate-500);
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+}
+.filter-tab:hover {
+    color: var(--slate-800);
+}
+.filter-tab.active {
+    color: var(--slate-900);
+    border-bottom-color: var(--slate-900);
+}
+
+/* Custom layout fixes */
+.fc-toolbar-chunk:first-child { display: flex; align-items: center; gap: 10px; }
+.fc-toolbar-chunk:first-child h2 { margin-right: 15px; }
+
+</style>
+{% endblock %}
+
 {% block content %}
-<main class="chat-main w-100" style="padding: 2rem;">
-    <header class="chat-header border-0 mb-4 px-0">
+<main class="chat-main w-100 bg-white" style="padding: 2rem 3rem;">
+    <!-- Header -->
+    <header class="d-flex justify-content-between align-items-center mb-4 pb-1">
         <div>
-            <h1 class="chat-title">Calendar</h1>
-            <div class="chat-subtitle">Your weekly overview</div>
+            <h1 class="chat-title fs-3 fw-bolder">Calendar</h1>
+            <div class="chat-subtitle mt-1 text-muted">Stay Organized and On Track with Your Personalized Calendar</div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center">
+                <img src="https://i.pravatar.cc/150?img=11" class="rounded-circle border border-2 border-white" style="width: 32px; height: 32px; margin-right: -10px; z-index: 3; object-fit: cover;" alt="AL">
+                <img src="https://i.pravatar.cc/150?img=32" class="rounded-circle border border-2 border-white" style="width: 32px; height: 32px; margin-right: -10px; z-index: 2; object-fit: cover;" alt="DT">
+                <div class="rounded-circle border border-2 border-white bg-light text-muted d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 32px; height: 32px; z-index: 1; font-size: 0.7rem;">+20</div>
+            </div>
+            <button class="btn btn-outline-secondary bg-white text-dark rounded-pill fw-medium px-3 shadow-sm border ms-3 d-flex align-items-center gap-2" style="font-size: 0.85rem;">
+                <i class="fa-solid fa-user-plus text-primary"></i> Invite
+            </button>
         </div>
     </header>
-    <div class="bg-white rounded-4 border p-4 shadow-sm text-center d-flex flex-column align-items-center justify-content-center" style="min-height: 400px; max-width: 1000px; border-style: dashed !important;">
-        <i class="fa-regular fa-calendar-days text-muted mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
-        <h5 class="fw-bold mb-2">Calendar View Coming Soon</h5>
-        <p class="text-muted max-w-sm">The full drag-and-drop calendar interface is currently under development.</p>
-        <button class="btn btn-primary rounded-pill mt-2 px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#meetingModal">
-            Create Meeting
-        </button>
+
+    <!-- Filters Row -->
+    <div class="d-flex justify-content-between align-items-center mb-4 border-bottom">
+        <div class="d-flex gap-4">
+            <div class="filter-tab active"><i class="fa-regular fa-calendar-check me-2"></i> All Scheduled</div>
+            <div class="filter-tab"><i class="fa-regular fa-star me-2"></i> Events</div>
+            <div class="filter-tab"><i class="fa-solid fa-clipboard-list me-2"></i> Meetings</div>
+            <div class="filter-tab"><i class="fa-regular fa-clock me-2"></i> Task Reminders</div>
+        </div>
+        <div class="d-flex align-items-center gap-2 pb-2">
+            <div class="position-relative">
+                <i class="fa-solid fa-magnifying-glass position-absolute mt-2 ms-3 text-muted" style="top:2px;"></i>
+                <input type="text" class="form-control form-control-sm border shadow-sm rounded-pill ps-5 py-2 fw-medium bg-white" placeholder="Search.." style="width: 200px;">
+            </div>
+            <button class="btn bg-white border shadow-sm rounded-pill px-3 py-2 text-dark fw-medium d-flex align-items-center gap-2 ms-2 hover-lift" style="font-size: 0.85rem;">
+                <i class="fa-solid fa-filter text-muted"></i> Filter
+            </button>
+            <button class="btn bg-white border shadow-sm rounded-circle d-flex align-items-center justify-content-center hover-lift" style="width: 36px; height: 36px;"><i class="fa-solid fa-ellipsis"></i></button>
+            <button class="btn btn-dark rounded-pill shadow-sm fw-medium px-4 py-2 d-flex align-items-center gap-2 ms-2 hover-lift" style="font-size: 0.85rem; background-color: #1e293b;" data-bs-toggle="modal" data-bs-target="#meetingModal">
+                <i class="fa-solid fa-plus"></i> New
+            </button>
+        </div>
+    </div>
+
+    <!-- Calendar Container -->
+    <div class="w-100" style="height: calc(100vh - 250px); min-height: 700px;">
+        <div id='calendar' class="h-100 w-100"></div>
     </div>
 </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    // Make mock dates dynamic around the current week
+    const today = new Date();
+    const day = today.getDay();
+    // Normalize to Monday start
+    const diff = today.getDate() - day + (day === 0 ? -6:1);
+    const startOfWeek = new Date(today.getFullYear(), today.getMonth(), diff);
+
+    const ds = (offsetDays, hours, mins=0) => {
+        let d = new Date(startOfWeek);
+        d.setDate(d.getDate() + offsetDays);
+        d.setHours(hours, mins, 0, 0);
+        return d.toISOString();
+    }
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+            left: 'title today',
+            center: 'timeGridDay,timeGridWeek,dayGridMonth',
+            right: 'prev,next'
+        },
+        slotMinTime: '08:00:00',
+        slotMaxTime: '17:00:00',
+        allDaySlot: false,
+        expandRows: true, // expand rows height across screen
+        dayHeaderFormat: { weekday: 'short', day: 'numeric' },
+        nowIndicator: true,
+        events: [
+            // Mon
+            {
+                title: 'Client Presentation Preparation',
+                start: ds(0, 8, 0),
+                end: ds(0, 9, 0),
+                classNames: ['bg-purple-subtle'],
+                borderColor: '#c084fc'
+            },
+            {
+                title: 'Client Meeting Planning',
+                start: ds(0, 9, 0),
+                end: ds(0, 10, 30),
+                classNames: ['bg-blue-subtle'],
+                borderColor: '#60a5fa'
+            },
+            {
+                title: 'Meetup with UI8 internal Team',
+                start: ds(0, 11, 0),
+                end: ds(0, 12, 0),
+                classNames: ['bg-green-subtle'],
+                borderColor: '#4ade80'
+            },
+            // Tue
+            {
+                title: 'Design Revisions',
+                start: ds(1, 9, 0),
+                end: ds(1, 10, 0),
+                classNames: ['bg-purple-subtle'],
+                borderColor: '#c084fc'
+            },
+            {
+                title: 'Client Feedback Meeting',
+                start: ds(1, 11, 0),
+                end: ds(1, 12, 30),
+                classNames: ['bg-blue-subtle'],
+                borderColor: '#60a5fa'
+            },
+            // Wed
+            {
+                title: 'New Project Kickoff Meeting',
+                start: ds(2, 8, 0),
+                end: ds(2, 9, 0),
+                classNames: ['bg-blue-subtle'],
+                borderColor: '#60a5fa'
+            },
+            {
+                title: 'Collaboration with Development Team',
+                start: ds(2, 10, 0),
+                end: ds(2, 11, 0),
+                classNames: ['bg-purple-subtle'],
+                borderColor: '#c084fc'
+            },
+            {
+                title: 'Meetup with Gojek internal team',
+                start: ds(2, 12, 0),
+                end: ds(2, 13, 0),
+                classNames: ['bg-green-subtle'],
+                borderColor: '#4ade80'
+            },
+            // Thu
+            {
+                title: 'Design Refinement',
+                start: ds(3, 9, 0),
+                end: ds(3, 10, 0),
+                classNames: ['bg-purple-subtle'],
+                borderColor: '#c084fc'
+            },
+            {
+                title: 'Client Meeting Progress report',
+                start: ds(3, 12, 0),
+                end: ds(3, 13, 30),
+                classNames: ['bg-blue-subtle'],
+                borderColor: '#60a5fa'
+            },
+            // Fri
+            {
+                title: 'Design Team Stand-up Meeting',
+                start: ds(4, 8, 30),
+                end: ds(4, 10, 0),
+                classNames: ['bg-blue-subtle'],
+                borderColor: '#60a5fa'
+            },
+            {
+                title: 'Final Touches on Client Project',
+                start: ds(4, 11, 0),
+                end: ds(4, 12, 0),
+                classNames: ['bg-purple-subtle'],
+                borderColor: '#c084fc'
+            },
+            {
+                title: 'Industry Webinar/Workshop',
+                start: ds(4, 13, 0),
+                end: ds(4, 14, 0),
+                classNames: ['bg-green-subtle'],
+                borderColor: '#4ade80'
+            },
+            // Sat
+            {
+                title: 'Planning & Goal Setting for the Week',
+                start: ds(5, 9, 0),
+                end: ds(5, 10, 0),
+                classNames: ['bg-purple-subtle'],
+                borderColor: '#c084fc'
+            },
+            {
+                title: 'Meetup with Adobe internal team',
+                start: ds(5, 10, 0),
+                end: ds(5, 11, 0),
+                classNames: ['bg-green-subtle'],
+                borderColor: '#4ade80'
+            }
+        ],
+        eventContent: function(arg) {
+            // Re-creating the UI style of pastel blocks with a top dashed border line
+            let timeText = arg.timeText;
+            let titleText = arg.event.title;
+            let borderColor = arg.event.borderColor;
+            
+            return {
+                html: `<div class="h-100 w-100 position-relative p-2" style="border-top: 3.5px dashed ${borderColor};">
+                          <div style="font-size: 0.65rem; font-weight: 600; opacity: 0.8; margin-bottom: 4px;">${timeText}</div>
+                          <div style="font-size: 0.72rem; font-weight: 700; line-height: 1.35; max-width: 90%; white-space: normal;">${titleText}</div>
+                       </div>`
+            };
+        }
+    });
+
+    calendar.render();
+});
+</script>
 {% endblock %}

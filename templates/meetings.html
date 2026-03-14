@@ -2,176 +2,1291 @@
 
 {% block title %}Meetings - AI Meeting Scheduler{% endblock %}
 
-{% block content %}
-<main class="chat-main w-100" style="padding: 2rem; background-color: #f8fafc;">
-    <header class="chat-header border-0 mb-4 px-0 bg-transparent">
-        <div>
-            <h1 class="chat-title fs-3 fw-bolder">Meetings</h1>
-            <div class="chat-subtitle mt-1 text-muted">Total: 24 active meetings</div>
-        </div>
-        <div class="ms-auto d-flex gap-2">
-            <button class="btn btn-outline-secondary bg-white text-dark rounded-pill fw-medium px-3 shadow-sm border-0 d-flex align-items-center gap-2">
-                <i class="fa-solid fa-download"></i> Export data
-            </button>
-            <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-medium d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#meetingModal" style="background-color: #6366f1; border-color: #6366f1;">
-                <i class="fa-solid fa-plus"></i> Add meeting
-            </button>
-        </div>
-    </header>
-    
-    <!-- Filters / Toolbar -->
-    <div class="d-flex align-items-center mb-4 gap-2 flex-wrap">
-        <select class="form-select border-0 shadow-sm rounded-pill w-auto px-4 py-2 text-muted fw-medium" style="background-color: white;">
-            <option>Type</option>
-            <option>Internal</option>
-            <option>External</option>
-        </select>
-        <select class="form-select border-0 shadow-sm rounded-pill w-auto px-4 py-2 text-muted fw-medium" style="background-color: white;">
-            <option>Duration</option>
-            <option>30 min</option>
-            <option>60 min</option>
-            <option>90 min</option>
-        </select>
-        <button class="btn bg-white border-0 shadow-sm rounded-pill px-3 py-2 text-muted fw-medium d-flex align-items-center gap-2 ms-2">
-            <i class="fa-solid fa-sliders"></i> All filters
-        </button>
+{% block head %}
+<style>
+/* ═══════════════════════════════════════
+   MEETINGS PAGE — PREMIUM UI
+   ═══════════════════════════════════════ */
 
-        <!-- Right side actions -->
-        <div class="ms-auto d-flex gap-2">
-            <button class="btn bg-white border-0 shadow-sm rounded-3 text-muted" style="width: 40px; height: 40px;" title="Edit"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn bg-white border-0 shadow-sm rounded-3 text-muted" style="width: 40px; height: 40px;" title="Archive"><i class="fa-regular fa-folder"></i></button>
-            <button class="btn bg-white border-0 shadow-sm rounded-3 text-muted" style="width: 40px; height: 40px;" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
+.meetings-root {
+    padding: 2rem 2.5rem;
+    background: #f4f6fb;
+    min-height: 100vh;
+}
+
+/* ── Page Header ── */
+.meetings-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.meetings-header-left h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #0d1117;
+    margin: 0 0 4px;
+    letter-spacing: -0.5px;
+}
+
+.meetings-header-left .sub {
+    font-size: 0.82rem;
+    color: #8b95a1;
+    font-weight: 500;
+}
+
+.header-btn-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btn-export {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: 1.5px solid #e1e7ef;
+    background: #fff;
+    color: #475569;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+}
+.btn-export:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    background: #f5f3ff;
+}
+
+.btn-add-meeting {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 20px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    box-shadow: 0 4px 15px rgba(99,102,241,.35);
+}
+.btn-add-meeting:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(99,102,241,.45);
+}
+
+/* ── Stats Row ── */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px 20px;
+    border: 1px solid #e8edf5;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all .2s;
+    cursor: default;
+}
+.stat-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,.07);
+    transform: translateY(-1px);
+}
+
+.stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.stat-icon.blue { background: #eff6ff; color: #3b82f6; }
+.stat-icon.purple { background: #f5f3ff; color: #8b5cf6; }
+.stat-icon.emerald { background: #ecfdf5; color: #10b981; }
+.stat-icon.amber { background: #fffbeb; color: #f59e0b; }
+
+.stat-info .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #0d1117;
+    line-height: 1;
+}
+.stat-info .stat-label {
+    font-size: 0.75rem;
+    color: #8b95a1;
+    font-weight: 500;
+    margin-top: 3px;
+}
+
+/* ── Toolbar ── */
+.meetings-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.toolbar-filter-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 8px 32px 8px 14px;
+    border: 1.5px solid #e1e7ef;
+    border-radius: 10px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat right 10px center;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color .2s;
+    font-family: 'DM Sans', sans-serif;
+}
+.toolbar-filter-select:focus {
+    outline: none;
+    border-color: #6366f1;
+}
+
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.search-box i {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    pointer-events: none;
+}
+.search-box input {
+    padding: 8px 14px 8px 34px;
+    border: 1.5px solid #e1e7ef;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #334155;
+    width: 220px;
+    transition: border-color .2s, box-shadow .2s;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+}
+.search-box input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.08);
+}
+
+.toolbar-icon-btn {
+    width: 38px;
+    height: 38px;
+    border: 1.5px solid #e1e7ef;
+    border-radius: 10px;
+    background: #fff;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all .15s;
+}
+.toolbar-icon-btn:hover {
+    border-color: #6366f1;
+    color: #6366f1;
+    background: #f5f3ff;
+}
+.toolbar-icon-btn.danger:hover {
+    border-color: #f43f5e;
+    color: #f43f5e;
+    background: #fff1f2;
+}
+
+.bulk-actions {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #f5f3ff, #eff6ff);
+    border: 1.5px solid #c4b5fd;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #6366f1;
+    animation: slideIn .2s ease;
+}
+.bulk-actions.visible { display: flex; }
+.bulk-actions .bulk-count {
+    background: #6366f1;
+    color: white;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.72rem;
+}
+
+/* ── Table Container ── */
+.table-container {
+    background: #fff;
+    border-radius: 16px;
+    border: 1px solid #e8edf5;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,.04);
+}
+
+/* DataTable Overrides */
+#meetingsTable {
+    width: 100% !important;
+    margin: 0 !important;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-family: 'DM Sans', sans-serif;
+}
+
+#meetingsTable thead tr {
+    background: #fafbfd;
+}
+#meetingsTable thead th {
+    padding: 14px 16px !important;
+    font-size: 0.7rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .6px !important;
+    color: #8b95a1 !important;
+    border-bottom: 1px solid #e8edf5 !important;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+}
+#meetingsTable thead th:hover { color: #475569 !important; }
+#meetingsTable thead th.sorting_asc::after,
+#meetingsTable thead th.sorting_desc::after { opacity: 0.7; }
+
+#meetingsTable tbody tr {
+    transition: background .15s;
+    border-bottom: 1px solid #f1f5f9;
+}
+#meetingsTable tbody tr:last-child { border-bottom: none; }
+#meetingsTable tbody tr:hover { background: #fafbff !important; }
+#meetingsTable tbody tr.selected-row { background: #f5f3ff !important; }
+#meetingsTable tbody td {
+    padding: 14px 16px !important;
+    vertical-align: middle;
+    border: none !important;
+    font-size: 0.82rem;
+}
+
+/* DataTables footer */
+.dataTables_wrapper .dt-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-top: 1px solid #f1f5f9;
+    background: #fafbfd;
+}
+.dataTables_info {
+    font-size: 0.75rem !important;
+    color: #94a3b8 !important;
+    font-weight: 500 !important;
+}
+.dataTables_paginate .pagination { gap: 4px; margin: 0; }
+.dataTables_paginate .page-item .page-link {
+    border: none !important;
+    border-radius: 8px !important;
+    color: #64748b !important;
+    padding: 6px 10px !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    background: transparent !important;
+    min-width: 32px;
+    text-align: center;
+    transition: all .15s;
+}
+.dataTables_paginate .page-item.active .page-link {
+    background: #6366f1 !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(99,102,241,.3);
+}
+.dataTables_paginate .page-item a.page-link:hover:not(.active) {
+    background: #f5f3ff !important;
+    color: #6366f1 !important;
+}
+.dataTables_paginate .page-item.disabled .page-link { opacity: 0.35; }
+.dataTables_length, .dataTables_filter { display: none !important; }
+
+/* ── Table Cell Styles ── */
+.meeting-title-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.meeting-monogram {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+    letter-spacing: .5px;
+}
+
+.meeting-name {
+    font-weight: 700;
+    color: #0d1117;
+    font-size: 0.85rem;
+}
+.meeting-participants {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    margin-top: 1px;
+}
+
+.type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+.type-internal { background: #eff6ff; color: #3b82f6; }
+.type-external { background: #fff7ed; color: #f97316; }
+.type-recurring { background: #f0fdf4; color: #22c55e; }
+.type-review { background: #fdf4ff; color: #a855f7; }
+
+.platform-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 500;
+}
+.platform-badge i { font-size: 0.8rem; }
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+.status-pill::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.status-upcoming { background: #eff6ff; color: #3b82f6; }
+.status-today { background: #f0fdf4; color: #16a34a; }
+.status-cancelled { background: #fff1f2; color: #e11d48; }
+.status-completed { background: #f8fafc; color: #94a3b8; }
+
+.date-cell { font-weight: 600; color: #334155; }
+.date-sub { font-size: 0.7rem; color: #94a3b8; margin-top: 1px; }
+
+.participant-avatars {
+    display: flex;
+    align-items: center;
+}
+.p-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+    margin-left: -6px;
+}
+.p-avatar:first-child { margin-left: 0; }
+.p-more {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #e0e7ff;
+    color: #6366f1;
+    font-size: 0.58rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    margin-left: -6px;
+}
+
+/* Action buttons */
+.action-btn-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity .15s;
+}
+tr:hover .action-btn-group { opacity: 1; }
+
+.act-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.78rem;
+    transition: all .15s;
+}
+.act-btn:hover { background: #f1f5f9; color: #475569; }
+.act-btn.edit:hover { background: #eff6ff; color: #3b82f6; }
+.act-btn.join:hover { background: #f0fdf4; color: #16a34a; }
+.act-btn.delete:hover { background: #fff1f2; color: #e11d48; }
+
+/* ── Add/Edit Modal ── */
+.modal-meetings .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 25px 60px rgba(0,0,0,.15);
+    overflow: hidden;
+}
+.modal-meetings .modal-header {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
+    padding: 22px 28px;
+}
+.modal-meetings .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    color: white;
+    font-size: 1.05rem;
+}
+.modal-meetings .btn-close {
+    filter: invert(1);
+    opacity: 0.7;
+}
+.modal-meetings .modal-body { padding: 28px; }
+.modal-meetings .modal-footer {
+    padding: 18px 28px;
+    background: #fafbfd;
+    border-top: 1px solid #e8edf5;
+}
+
+.field-group { margin-bottom: 20px; }
+.field-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #475569;
+    margin-bottom: 7px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+.field-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #e1e7ef;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    color: #334155;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    background: #fafbfd;
+}
+.field-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99,102,241,.1);
+    background: white;
+}
+
+.modal-btn-cancel {
+    padding: 9px 22px;
+    border-radius: 10px;
+    border: 1.5px solid #e1e7ef;
+    background: white;
+    color: #64748b;
+    font-size: 0.83rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .15s;
+}
+.modal-btn-cancel:hover { border-color: #94a3b8; color: #334155; }
+
+.modal-btn-save {
+    padding: 9px 26px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    font-size: 0.83rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all .2s;
+    box-shadow: 0 4px 12px rgba(99,102,241,.3);
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.modal-btn-save:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(99,102,241,.4);
+}
+
+/* ── Delete Confirm Modal ── */
+.modal-delete .modal-content {
+    border-radius: 18px;
+    border: none;
+    box-shadow: 0 20px 50px rgba(0,0,0,.12);
+}
+.modal-delete .modal-body { padding: 32px; text-align: center; }
+.delete-icon {
+    width: 64px;
+    height: 64px;
+    background: #fff1f2;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #f43f5e;
+    margin: 0 auto 20px;
+}
+.delete-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0d1117;
+    margin-bottom: 8px;
+}
+.delete-sub { font-size: 0.83rem; color: #64748b; margin-bottom: 24px; }
+.modal-btn-delete {
+    padding: 10px 28px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    color: white;
+    font-size: 0.83rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    box-shadow: 0 4px 12px rgba(244,63,94,.3);
+    transition: all .2s;
+}
+.modal-btn-delete:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(244,63,94,.4);
+}
+
+/* ── Toast ── */
+.toast-stack {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.toast-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: #0d1117;
+    color: white;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    min-width: 260px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.2);
+    animation: toastIn .3s cubic-bezier(.16,1,.3,1);
+}
+.toast-item.success .toast-icon { color: #4ade80; }
+.toast-item.error .toast-icon { color: #f87171; }
+.toast-icon { font-size: 1rem; }
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateX(30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Loading skeleton ── */
+.skeleton-row td { padding: 14px 16px !important; }
+.skeleton {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e8edf5 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    border-radius: 6px;
+    animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="chat-main w-100 meetings-root">
+
+    <!-- Header -->
+    <div class="meetings-header">
+        <div class="meetings-header-left">
+            <h1>Meetings</h1>
+            <div class="sub"><span id="totalCount">Loading...</span> total meetings</div>
+        </div>
+        <div class="header-btn-group">
+            <button class="btn-export" onclick="exportCSV()">
+                <i class="fa-solid fa-arrow-down-to-line"></i> Export CSV
+            </button>
+            <button class="btn-add-meeting" onclick="openAddModal()">
+                <i class="fa-solid fa-plus"></i> New Meeting
+            </button>
         </div>
     </div>
 
-    <!-- Table Container -->
-    <div class="bg-white rounded-4 shadow-sm w-100 overflow-visible" style="border: 1px solid var(--slate-200); position: relative;">
-        <table id="meetingsTable" class="table table-hover align-middle mb-0 w-100 premium-datatable">
-            <thead class="text-uppercase text-muted" style="font-size: 0.75rem; background: #fdfdfd;">
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa-regular fa-calendar-days"></i></div>
+            <div class="stat-info">
+                <div class="stat-val" id="statTotal">—</div>
+                <div class="stat-label">Total Meetings</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon emerald"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="stat-info">
+                <div class="stat-val" id="statToday">—</div>
+                <div class="stat-label">Today</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <div class="stat-info">
+                <div class="stat-val" id="statUpcoming">—</div>
+                <div class="stat-label">Upcoming</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon amber"><i class="fa-solid fa-users"></i></div>
+            <div class="stat-info">
+                <div class="stat-val" id="statExternal">—</div>
+                <div class="stat-label">External</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="meetings-toolbar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="Search meetings...">
+        </div>
+        <select class="toolbar-filter-select" id="filterType">
+            <option value="">All Types</option>
+            <option value="Internal">Internal</option>
+            <option value="External">External</option>
+            <option value="Recurring">Recurring</option>
+            <option value="Review">Review</option>
+        </select>
+        <select class="toolbar-filter-select" id="filterStatus">
+            <option value="">All Status</option>
+            <option value="Today">Today</option>
+            <option value="Upcoming">Upcoming</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+        <select class="toolbar-filter-select" id="filterDuration">
+            <option value="">Any Duration</option>
+            <option value="15">15 min</option>
+            <option value="30">30 min</option>
+            <option value="60">60 min</option>
+            <option value="90">90+ min</option>
+        </select>
+
+        <!-- Bulk actions (hidden until selection) -->
+        <div class="bulk-actions" id="bulkActions">
+            <span class="bulk-count" id="bulkCount">0</span> selected
+            <button class="toolbar-icon-btn" title="Delete Selected" onclick="bulkDelete()">
+                <i class="fa-regular fa-trash-can"></i>
+            </button>
+        </div>
+
+        <div style="margin-left:auto; display:flex; gap:8px;">
+            <button class="toolbar-icon-btn" title="Refresh" onclick="loadMeetings()">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+            <button class="toolbar-icon-btn danger" title="Clear All" onclick="confirmClearAll()">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+        <table id="meetingsTable" class="table w-100 mb-0">
+            <thead>
                 <tr>
-                    <th class="ps-4 border-bottom-0" style="width: 40px;"><input class="form-check-input row-checkbox-all" type="checkbox" style="background-color: #6366f1; border-color: #6366f1;"></th>
-                    <th class="border-bottom-0">ID <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
-                    <th class="border-bottom-0">MEETING TITLE <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
-                    <th class="border-bottom-0">TYPE <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
-                    <th class="border-bottom-0">DATE <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
-                    <th class="border-bottom-0">TIME <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
-                    <th class="border-bottom-0 text-center pe-4">ACTIONS</th>
+                    <th style="width:42px;" class="ps-3">
+                        <input type="checkbox" class="form-check-input" id="selectAll" style="width:16px;height:16px;">
+                    </th>
+                    <th>Meeting</th>
+                    <th>Type</th>
+                    <th>Date & Time</th>
+                    <th>Duration</th>
+                    <th>Platform</th>
+                    <th>Status</th>
+                    <th>Participants</th>
+                    <th style="width:120px; text-align:center;">Actions</th>
                 </tr>
             </thead>
-            <tbody class="border-top-0">
-                <tr>
-                    <td class="ps-4"><input class="form-check-input row-checkbox" type="checkbox"></td>
-                    <td class="text-muted fw-medium">447</td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 32px; height: 32px; font-size: 0.8rem;">DS</div>
-                            <span class="fw-bold text-dark">Design Sync</span>
-                        </div>
-                    </td>
-                    <td class="text-muted fw-medium">Internal</td>
-                    <td class="fw-medium">Oct 24, 2026</td>
-                    <td class="text-muted">10:00 AM</td>
-                    <td class="text-center pe-4">
-                        <div class="d-flex justify-content-center gap-3 align-items-center text-muted">
-                            <i class="fa-solid fa-video cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
-                            <i class="fa-regular fa-envelope cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
-                            <i class="fa-solid fa-ellipsis cursor-pointer" data-bs-toggle="dropdown"></i>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 m-0 mt-2">
-                                <li><a class="dropdown-item py-2 text-muted fw-semibold rounded-3 mb-1" href="#"><i class="fa-solid fa-pen me-2 text-primary"></i> Edit</a></li>
-                                <li><a class="dropdown-item py-2 text-muted fw-semibold rounded-3" href="#"><i class="fa-regular fa-calendar-xmark me-2"></i> Reschedule</a></li>
-                                <li><hr class="dropdown-divider my-1 border-light"></li>
-                                <li><a class="dropdown-item py-2 text-danger fw-semibold rounded-3" href="#"><i class="fa-regular fa-trash-can me-2"></i> Delete</a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr style="background-color: #f5f3ff;">
-                    <td class="ps-4"><input class="form-check-input row-checkbox" type="checkbox" checked style="background-color: #6366f1; border-color: #6366f1;"></td>
-                    <td class="text-muted fw-medium">877</td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 32px; height: 32px; font-size: 0.8rem;">CC</div>
-                            <span class="fw-bold text-dark">Client Call: TechCorp</span>
-                        </div>
-                    </td>
-                    <td class="text-muted fw-medium">External</td>
-                    <td class="fw-medium">Oct 24, 2026</td>
-                    <td class="text-muted">02:30 PM</td>
-                    <td class="text-center pe-4">
-                        <div class="d-flex justify-content-center gap-3 align-items-center text-muted">
-                            <i class="fa-solid fa-phone cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
-                            <i class="fa-regular fa-envelope cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
-                            <i class="fa-solid fa-ellipsis cursor-pointer" data-bs-toggle="dropdown"></i>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="ps-4"><input class="form-check-input row-checkbox" type="checkbox"></td>
-                    <td class="text-muted fw-medium">556</td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2">
-                            <img src="https://i.pravatar.cc/150?img=5" class="rounded-circle shadow-sm" style="width: 32px; height: 32px; object-fit: cover;">
-                            <span class="fw-bold text-dark">1:1 with Emma</span>
-                        </div>
-                    </td>
-                    <td class="text-muted fw-medium">Internal</td>
-                    <td class="fw-medium">Oct 25, 2026</td>
-                    <td class="text-muted">11:00 AM</td>
-                    <td class="text-center pe-4">
-                        <div class="d-flex justify-content-center gap-3 align-items-center text-muted">
-                            <i class="fa-solid fa-video cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
-                            <i class="fa-regular fa-envelope cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
-                            <i class="fa-solid fa-ellipsis cursor-pointer" data-bs-toggle="dropdown"></i>
-                        </div>
-                    </td>
-                </tr>
+            <tbody id="tableBody">
+                <!-- Rows injected by JS -->
             </tbody>
         </table>
     </div>
 </main>
+
+<!-- ══════════ ADD / EDIT MODAL ══════════ -->
+<div class="modal fade modal-meetings" id="meetingCrudModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="crudModalTitle">
+                    <i class="fa-regular fa-calendar-plus me-2"></i>New Meeting
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editMeetingId">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="field-group mb-0">
+                            <label class="field-label">Meeting Title *</label>
+                            <input type="text" class="field-input" id="fTitle" placeholder="e.g. Q3 Strategy Review">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="field-group mb-0">
+                            <label class="field-label">Type *</label>
+                            <select class="field-input" id="fType">
+                                <option value="Internal">Internal</option>
+                                <option value="External">External</option>
+                                <option value="Recurring">Recurring</option>
+                                <option value="Review">Review</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="field-group mb-0">
+                            <label class="field-label">Platform</label>
+                            <select class="field-input" id="fPlatform">
+                                <option value="Google Meet">Google Meet</option>
+                                <option value="Zoom">Zoom</option>
+                                <option value="Teams">Microsoft Teams</option>
+                                <option value="Phone">Phone Call</option>
+                                <option value="In-person">In-person</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="field-group mb-0">
+                            <label class="field-label">Date *</label>
+                            <input type="date" class="field-input" id="fDate">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="field-group mb-0">
+                            <label class="field-label">Time *</label>
+                            <input type="time" class="field-input" id="fTime">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="field-group mb-0">
+                            <label class="field-label">Duration</label>
+                            <select class="field-input" id="fDuration">
+                                <option value="15">15 minutes</option>
+                                <option value="30" selected>30 minutes</option>
+                                <option value="45">45 minutes</option>
+                                <option value="60">1 hour</option>
+                                <option value="90">1.5 hours</option>
+                                <option value="120">2 hours</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="field-group mb-0">
+                            <label class="field-label">Participants (comma-separated emails)</label>
+                            <input type="text" class="field-input" id="fParticipants" placeholder="alice@co.com, bob@co.com">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="field-group mb-0">
+                            <label class="field-label">Meeting Link</label>
+                            <input type="text" class="field-input" id="fLink" placeholder="https://meet.google.com/...">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                <button class="modal-btn-save" onclick="saveMeetingCrud()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span id="saveLabel">Create Meeting</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════ DELETE CONFIRM MODAL ══════════ -->
+<div class="modal fade modal-delete" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="delete-icon"><i class="fa-solid fa-trash-can"></i></div>
+                <div class="delete-title">Delete Meeting?</div>
+                <div class="delete-sub" id="deleteDesc">This action cannot be undone.</div>
+                <div class="d-flex gap-3 justify-content-center">
+                    <button class="modal-btn-cancel" data-bs-dismiss="modal">Cancel</button>
+                    <button class="modal-btn-delete" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-stack" id="toastStack"></div>
 {% endblock %}
 
 {% block scripts %}
-<style>
-.premium-datatable th { border-bottom: 1px solid var(--slate-200) !important; padding: 18px 16px !important; color: var(--slate-500) !important; font-weight: 600 !important; }
-.premium-datatable td { padding: 16px 16px !important; border-bottom: 1px solid var(--slate-100); vertical-align: middle; border-bottom-color: #ede9fe; }
-.premium-datatable tbody tr { transition: background-color 0.2s; }
-.premium-datatable tbody tr:hover { background-color: var(--slate-50) !important; }
-.dataTables_wrapper .d-flex.justify-content-between { border-top: 1px solid var(--slate-100); background: #fcfcfd; }
-.dataTables_paginate .pagination { gap: 4px; }
-.dataTables_paginate .page-item .page-link { border: none; border-radius: 6px; color: var(--slate-600); padding: 6px 10px; font-weight: 600; font-size: 0.85rem; background: transparent; }
-.dataTables_paginate .page-item.active .page-link { background-color: #e0e7ff; color: #4f46e5; }
-.dataTables_paginate .page-item a.page-link:hover:not(.active) { background-color: var(--slate-100); color: var(--slate-900); }
-.dataTables_paginate .page-item.disabled .page-link { opacity: 0.4; background-color: transparent; }
-.form-check-input:checked { background-color: #6366f1; border-color: #6366f1; }
-.table-primary-subtle { background-color: #f5f3ff !important; }
-.dropdown-item:hover { background-color: var(--slate-50); }
-.dataTables_length, .dataTables_filter { display: none !important; }
-.dropdown-menu { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1) !important; }
-</style>
 <script>
-$(document).ready(function() {
-    $('#meetingsTable').DataTable({
-        "dom": 't<"d-flex justify-content-between align-items-center px-4 py-3"<"text-muted small fw-medium"i><"d-flex align-items-center small"p>>',
-        "pagingType": "simple",
-        "pageLength": 10,
-        "language": {
-            "info": "_START_ to _END_ of _TOTAL_",
-            "paginate": { "previous": "<i class='fa-solid fa-chevron-left'></i>", "next": "Page 1 of 2 <i class='fa-solid fa-chevron-right ms-2'></i>" }
-        },
-        "columnDefs": [ { "orderable": false, "targets": [0, 6] } ]
-    });
+// ════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════
+let allMeetings   = [];
+let dtTable       = null;
+let selectedIds   = new Set();
+let pendingDelete = null;  // { id } or 'bulk'
 
-    $('.row-checkbox-all').on('change', function() {
-        var isChecked = $(this).prop('checked');
-        $('.row-checkbox').prop('checked', isChecked);
-        if (isChecked) $('.row-checkbox').closest('tr').css('background-color', '#f5f3ff');
-        else $('.row-checkbox').closest('tr').css('background-color', '');
+const PLATFORM_ICONS = {
+    'Google Meet': '<i class="fa-brands fa-google text-danger"></i>',
+    'Zoom':        '<i class="fa-solid fa-video text-blue-500" style="color:#2D8CFF"></i>',
+    'Teams':       '<i class="fa-brands fa-microsoft" style="color:#5059c9"></i>',
+    'Phone':       '<i class="fa-solid fa-phone text-emerald"></i>',
+    'In-person':   '<i class="fa-solid fa-building" style="color:#f59e0b"></i>',
+};
+
+// ════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+    initDataTable();
+    loadMeetings();
+
+    document.getElementById('searchInput').addEventListener('input', e => {
+        dtTable.search(e.target.value).draw();
     });
-    $('.row-checkbox').on('change', function() {
-        if ($(this).prop('checked')) $(this).closest('tr').css('background-color', '#f5f3ff');
-        else $(this).closest('tr').css('background-color', '');
-    });
+    document.getElementById('filterType').addEventListener('change', applyFilters);
+    document.getElementById('filterStatus').addEventListener('change', applyFilters);
+    document.getElementById('filterDuration').addEventListener('change', applyFilters);
+    document.getElementById('selectAll').addEventListener('change', toggleSelectAll);
 });
+
+function initDataTable() {
+    dtTable = $('#meetingsTable').DataTable({
+        dom: 't<"dt-footer-row"<"dataTables_info"i><"dataTables_paginate"p>>',
+        pagingType: 'simple_numbers',
+        pageLength: 10,
+        language: {
+            info: 'Showing _START_–_END_ of _TOTAL_ meetings',
+            paginate: {
+                previous: '<i class="fa-solid fa-chevron-left"></i>',
+                next:     '<i class="fa-solid fa-chevron-right"></i>'
+            },
+            emptyTable: '<div style="padding:40px 0;color:#94a3b8;font-size:0.85rem;">No meetings found. Create one to get started.</div>'
+        },
+        columnDefs: [
+            { orderable: false, targets: [0, 8] },
+            { type: 'date', targets: [3] }
+        ],
+        order: [[3, 'asc']]
+    });
+}
+
+// ════════════════════════════════════════
+//  API: LOAD
+// ════════════════════════════════════════
+async function loadMeetings() {
+    try {
+        const res  = await fetch('/api/meetings');
+        const data = await res.json();
+        allMeetings = data.meetings || [];
+        renderTable(allMeetings);
+        renderStats(allMeetings);
+    } catch (e) {
+        showToast('Failed to load meetings', 'error');
+    }
+}
+
+function renderStats(meetings) {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('statTotal').textContent    = meetings.length;
+    document.getElementById('statToday').textContent    = meetings.filter(m => m.date === today).length;
+    document.getElementById('statUpcoming').textContent = meetings.filter(m => m.date > today).length;
+    document.getElementById('statExternal').textContent = meetings.filter(m => m.type === 'External').length;
+    document.getElementById('totalCount').textContent   = meetings.length;
+}
+
+function renderTable(meetings) {
+    dtTable.clear();
+    meetings.forEach(m => {
+        const status = computeStatus(m.date);
+        dtTable.row.add([
+            `<input type="checkbox" class="form-check-input row-chk" data-id="${m.id}" style="width:16px;height:16px;" onchange="handleRowSelect(this)">`,
+            buildTitleCell(m),
+            buildTypeBadge(m.type),
+            buildDateCell(m.date, m.time),
+            `<span style="font-weight:600;color:#475569;">${m.duration} min</span>`,
+            buildPlatformCell(m.platform || 'Google Meet'),
+            buildStatusPill(status),
+            buildParticipants(m.participants),
+            buildActions(m.id, m.title)
+        ]);
+    });
+    dtTable.draw();
+}
+
+// ════════════════════════════════════════
+//  CELL BUILDERS
+// ════════════════════════════════════════
+function monogramColor(title) {
+    const colors = [
+        '#6366f1','#8b5cf6','#ec4899','#14b8a6',
+        '#f59e0b','#10b981','#3b82f6','#ef4444'
+    ];
+    let h = 0;
+    for (let c of title) h = (h * 31 + c.charCodeAt(0)) % colors.length;
+    return colors[h];
+}
+
+function buildTitleCell(m) {
+    const mono = (m.title || '?').replace(/[^A-Za-z0-9 ]/g,'').trim().split(' ').slice(0,2).map(w=>w[0]?.toUpperCase()||'').join('');
+    const color = monogramColor(m.title);
+    const participants = m.participants ? m.participants.split(',').filter(Boolean).length : 0;
+    return `<div class="meeting-title-cell">
+        <div class="meeting-monogram" style="background:${color}">${mono}</div>
+        <div>
+            <div class="meeting-name">${escHtml(m.title)}</div>
+            <div class="meeting-participants">${participants} participant${participants !== 1 ? 's' : ''}</div>
+        </div>
+    </div>`;
+}
+
+function buildTypeBadge(type) {
+    const cls = { Internal:'type-internal', External:'type-external', Recurring:'type-recurring', Review:'type-review' };
+    const icon = { Internal:'🏢', External:'🌐', Recurring:'🔁', Review:'📋' };
+    return `<span class="type-badge ${cls[type]||'type-internal'}">${icon[type]||'📅'} ${type||'Internal'}</span>`;
+}
+
+function buildDateCell(date, time) {
+    if (!date) return '<span style="color:#94a3b8">—</span>';
+    const d = new Date(date + 'T00:00');
+    const label = d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+    return `<div class="date-cell">${label}<div class="date-sub"><i class="fa-regular fa-clock me-1"></i>${time||''}</div></div>`;
+}
+
+function buildPlatformCell(platform) {
+    const icon = PLATFORM_ICONS[platform] || '<i class="fa-solid fa-video"></i>';
+    return `<span class="platform-badge">${icon} ${platform}</span>`;
+}
+
+function computeStatus(date) {
+    if (!date) return 'Upcoming';
+    const today = new Date().toISOString().split('T')[0];
+    if (date === today) return 'Today';
+    if (date > today)   return 'Upcoming';
+    return 'Completed';
+}
+
+function buildStatusPill(status) {
+    const cls = { Today:'status-today', Upcoming:'status-upcoming', Completed:'status-completed', Cancelled:'status-cancelled' };
+    return `<span class="status-pill ${cls[status]||'status-upcoming'}">${status}</span>`;
+}
+
+function buildParticipants(participantsStr) {
+    if (!participantsStr || !participantsStr.trim()) return '<span style="color:#94a3b8;font-size:0.75rem;">No participants</span>';
+    const list = participantsStr.split(',').map(p=>p.trim()).filter(Boolean);
+    const imgs = list.slice(0,3).map((_, i) =>
+        `<img src="https://i.pravatar.cc/150?img=${(i+10)}" class="p-avatar" title="${list[i]}">`
+    ).join('');
+    const more = list.length > 3 ? `<span class="p-more">+${list.length-3}</span>` : '';
+    return `<div class="participant-avatars">${imgs}${more}</div>`;
+}
+
+function buildActions(id, title) {
+    return `<div class="action-btn-group" style="justify-content:center;">
+        <button class="act-btn join" onclick="joinMeeting(${id})" title="Join"><i class="fa-solid fa-video"></i></button>
+        <button class="act-btn edit" onclick="openEditModal(${id})" title="Edit"><i class="fa-solid fa-pen"></i></button>
+        <button class="act-btn delete" onclick="openDeleteModal(${id}, '${escHtml(title).replace(/'/g,"\\'")}')` + `" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
+    </div>`;
+}
+
+// ════════════════════════════════════════
+//  FILTERS
+// ════════════════════════════════════════
+function applyFilters() {
+    const type     = document.getElementById('filterType').value.toLowerCase();
+    const status   = document.getElementById('filterStatus').value.toLowerCase();
+    const duration = document.getElementById('filterDuration').value;
+
+    $.fn.dataTable.ext.search = [];
+
+    if (type || status || duration) {
+        $.fn.dataTable.ext.search.push((settings, data) => {
+            if (settings.nTable.id !== 'meetingsTable') return true;
+            const rowType     = data[2].toLowerCase();
+            const rowStatus   = data[6].toLowerCase();
+            const rowDuration = parseInt(data[4]) || 0;
+
+            if (type   && !rowType.includes(type))     return false;
+            if (status && !rowStatus.includes(status)) return false;
+            if (duration) {
+                if (duration === '90' && rowDuration < 90) return false;
+                if (duration !== '90' && rowDuration !== parseInt(duration)) return false;
+            }
+            return true;
+        });
+    }
+    dtTable.draw();
+}
+
+// ════════════════════════════════════════
+//  SELECTION
+// ════════════════════════════════════════
+function toggleSelectAll() {
+    const checked = document.getElementById('selectAll').checked;
+    document.querySelectorAll('.row-chk').forEach(chk => {
+        chk.checked = checked;
+        const id = parseInt(chk.dataset.id);
+        checked ? selectedIds.add(id) : selectedIds.delete(id);
+        chk.closest('tr').classList.toggle('selected-row', checked);
+    });
+    updateBulkBar();
+}
+
+function handleRowSelect(chk) {
+    const id = parseInt(chk.dataset.id);
+    if (chk.checked) { selectedIds.add(id); chk.closest('tr').classList.add('selected-row'); }
+    else             { selectedIds.delete(id); chk.closest('tr').classList.remove('selected-row'); }
+    updateBulkBar();
+}
+
+function updateBulkBar() {
+    const bar = document.getElementById('bulkActions');
+    document.getElementById('bulkCount').textContent = selectedIds.size;
+    bar.classList.toggle('visible', selectedIds.size > 0);
+}
+
+// ════════════════════════════════════════
+//  CRUD: CREATE / UPDATE
+// ════════════════════════════════════════
+function openAddModal() {
+    document.getElementById('editMeetingId').value = '';
+    document.getElementById('crudModalTitle').innerHTML = '<i class="fa-regular fa-calendar-plus me-2"></i>New Meeting';
+    document.getElementById('saveLabel').textContent = 'Create Meeting';
+    ['fTitle','fParticipants','fLink'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fType').value     = 'Internal';
+    document.getElementById('fPlatform').value = 'Google Meet';
+    document.getElementById('fDuration').value = '30';
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('fDate').value = today;
+    document.getElementById('fTime').value = '10:00';
+    new bootstrap.Modal(document.getElementById('meetingCrudModal')).show();
+}
+
+function openEditModal(id) {
+    const m = allMeetings.find(x => x.id === id);
+    if (!m) return;
+    document.getElementById('editMeetingId').value    = m.id;
+    document.getElementById('crudModalTitle').innerHTML = '<i class="fa-solid fa-pen me-2"></i>Edit Meeting';
+    document.getElementById('saveLabel').textContent  = 'Save Changes';
+    document.getElementById('fTitle').value           = m.title;
+    document.getElementById('fType').value            = m.type || 'Internal';
+    document.getElementById('fPlatform').value        = m.platform || 'Google Meet';
+    document.getElementById('fDate').value            = m.date;
+    document.getElementById('fTime').value            = m.time;
+    document.getElementById('fDuration').value        = String(m.duration);
+    document.getElementById('fParticipants').value    = m.participants || '';
+    document.getElementById('fLink').value            = m.link || '';
+    new bootstrap.Modal(document.getElementById('meetingCrudModal')).show();
+}
+
+async function saveMeetingCrud() {
+    const id    = document.getElementById('editMeetingId').value;
+    const title = document.getElementById('fTitle').value.trim();
+    if (!title) { showToast('Meeting title is required', 'error'); return; }
+
+    const payload = {
+        title,
+        type:         document.getElementById('fType').value,
+        platform:     document.getElementById('fPlatform').value,
+        date:         document.getElementById('fDate').value,
+        time:         document.getElementById('fTime').value,
+        duration:     parseInt(document.getElementById('fDuration').value),
+        participants: document.getElementById('fParticipants').value,
+        link:         document.getElementById('fLink').value,
+    };
+
+    try {
+        const isEdit = !!id;
+        const url    = isEdit ? `/api/meetings/${id}` : '/api/meetings';
+        const method = isEdit ? 'PUT' : 'POST';
+        const res    = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error();
+
+        bootstrap.Modal.getInstance(document.getElementById('meetingCrudModal'))?.hide();
+        showToast(isEdit ? 'Meeting updated ✓' : 'Meeting created ✓', 'success');
+        await loadMeetings();
+    } catch {
+        showToast('Something went wrong. Please try again.', 'error');
+    }
+}
+
+// ════════════════════════════════════════
+//  CRUD: DELETE
+// ════════════════════════════════════════
+function openDeleteModal(id, title) {
+    pendingDelete = { type: 'single', id };
+    document.getElementById('deleteDesc').textContent = `"${title}" will be permanently removed.`;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    document.getElementById('confirmDeleteBtn').onclick = execDelete;
+}
+
+async function execDelete() {
+    bootstrap.Modal.getInstance(document.getElementById('deleteModal'))?.hide();
+    if (!pendingDelete) return;
+
+    try {
+        if (pendingDelete.type === 'single') {
+            const res = await fetch(`/api/meetings/${pendingDelete.id}`, { method: 'DELETE' });
+            if (!res.ok) throw new Error();
+            showToast('Meeting deleted', 'success');
+        } else if (pendingDelete.type === 'bulk') {
+            await Promise.all([...selectedIds].map(id =>
+                fetch(`/api/meetings/${id}`, { method: 'DELETE' })
+            ));
+            selectedIds.clear();
+            updateBulkBar();
+            showToast('Meetings deleted', 'success');
+        }
+        await loadMeetings();
+    } catch {
+        showToast('Delete failed. Try again.', 'error');
+    }
+    pendingDelete = null;
+}
+
+function bulkDelete() {
+    if (!selectedIds.size) return;
+    pendingDelete = { type: 'bulk' };
+    document.getElementById('deleteDesc').textContent = `${selectedIds.size} meeting(s) will be permanently removed.`;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    document.getElementById('confirmDeleteBtn').onclick = execDelete;
+}
+
+function confirmClearAll() {
+    if (!allMeetings.length) { showToast('No meetings to clear', 'error'); return; }
+    pendingDelete = { type: 'clearAll' };
+    document.getElementById('deleteDesc').textContent = `All ${allMeetings.length} meetings will be permanently removed.`;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+    document.getElementById('confirmDeleteBtn').onclick = async () => {
+        bootstrap.Modal.getInstance(document.getElementById('deleteModal'))?.hide();
+        try {
+            const res = await fetch('/api/meetings/all', { method: 'DELETE' });
+            if (!res.ok) throw new Error();
+            showToast('All meetings cleared', 'success');
+            await loadMeetings();
+        } catch { showToast('Failed to clear meetings', 'error'); }
+    };
+}
+
+// ════════════════════════════════════════
+//  JOIN
+// ════════════════════════════════════════
+function joinMeeting(id) {
+    const m = allMeetings.find(x => x.id === id);
+    if (m?.link) { window.open(m.link, '_blank'); return; }
+    showToast('No meeting link available', 'error');
+}
+
+// ════════════════════════════════════════
+//  EXPORT
+// ════════════════════════════════════════
+function exportCSV() {
+    if (!allMeetings.length) { showToast('No data to export', 'error'); return; }
+    const cols = ['id','title','type','date','time','duration','platform','participants'];
+    const csv  = [cols.join(','), ...allMeetings.map(m =>
+        cols.map(c => `"${String(m[c]||'').replace(/"/g,'""')}"`).join(',')
+    )].join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv' }));
+    a.download = `meetings-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    showToast('Exported successfully ✓', 'success');
+}
+
+// ════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════
+function showToast(msg, type='success') {
+    const stack = document.getElementById('toastStack');
+    const el    = document.createElement('div');
+    el.className = `toast-item ${type}`;
+    el.innerHTML = `<span class="toast-icon"><i class="fa-solid ${type==='success'?'fa-circle-check':'fa-circle-xmark'}"></i></span>${msg}`;
+    stack.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+}
+
+function escHtml(str) {
+    return String(str||'').replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]));
+}
 </script>
 {% endblock %}
