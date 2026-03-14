@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Calendar - AI Meeting Scheduler{% endblock %}
+
+{% block content %}
+<main class="chat-main w-100" style="padding: 2rem;">
+    <header class="chat-header border-0 mb-4 px-0">
+        <div>
+            <h1 class="chat-title">Calendar</h1>
+            <div class="chat-subtitle">Your weekly overview</div>
+        </div>
+    </header>
+    <div class="bg-white rounded-4 border p-4 shadow-sm text-center d-flex flex-column align-items-center justify-content-center" style="min-height: 400px; max-width: 1000px; border-style: dashed !important;">
+        <i class="fa-regular fa-calendar-days text-muted mb-3" style="font-size: 3rem; opacity: 0.5;"></i>
+        <h5 class="fw-bold mb-2">Calendar View Coming Soon</h5>
+        <p class="text-muted max-w-sm">The full drag-and-drop calendar interface is currently under development.</p>
+        <button class="btn btn-primary rounded-pill mt-2 px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#meetingModal">
+            Create Meeting
+        </button>
+    </div>
+</main>
+{% endblock %}
