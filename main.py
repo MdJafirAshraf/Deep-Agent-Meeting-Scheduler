@@ -1,7 +1,17 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+
+from database.config import engine, Base
+from database.seed import seed_database
 from routers import pages, chat, meetings, contacts
+
+# Create database tables
+Base.metadata.create_all(bind=engine)
+
+# Seed database securely
+seed_database()
+
 
 app = FastAPI(title="AI Meeting Scheduler", version="2.0.0")
 

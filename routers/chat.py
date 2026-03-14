@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 from datetime import datetime
-from models.schemas import ChatMessage
-from database.store import chat_history
+from models import models, schemas
+from database.config import get_db
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
@@ -55,13 +56,24 @@ def generate_ai_response(user_message: str) -> str:
     )
 
 @router.post("")
-async def chat(msg: ChatMessage):
+async def chat(msg: schemas.ChatMessage, db: Session = Depends(get_db)):
     user_text = msg.message.strip()
-    chat_history.append({"role": "user", "content": user_text, "timestamp": datetime.now().isoformat()})
+    
+    # Save user message
+    db_user_msg = models.ChatMessage(role="user", content=user_text)
+    db.add(db_user_msg)
+    
+    # Generate and save AI response
     ai_response = generate_ai_response(user_text)
-    chat_history.append({"role": "assistant", "content": ai_response, "timestamp": datetime.now().isoformat()})
+    db_ai_msg = models.ChatMessage(role="assistant", content=ai_response)
+    db.add(db_ai_msg)
+    
+    db.commit()
+    
     return JSONResponse(content={"response": ai_response})
 
 @router.get("/history")
-async def get_chat_history():
-    return JSONResponse(content={"history": chat_history})
+async def get_chat_history(db: Session = Depends(get_db)):
+    history = db.query(models.ChatMessage).order_by(models.ChatMessage.timestamp.asc()).all()
+    history_data = [{c.name: getattr(msg, c.name) for c in msg.__table__.columns} for msg in history]
+    return JSONResponse(content={"history": history_data})

@@ -1,91 +1,108 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from sqlalchemy.orm import Session
 from typing import Optional
-from datetime import datetime
-from models.schemas import MeetingCreate, MeetingUpdate
-from database.store import meetings, next_mid
+from models import models, schemas
+from database.config import get_db
 
 router = APIRouter(prefix="/api/meetings", tags=["meetings"])
 
 @router.get("")
-async def list_meetings(type: Optional[str] = None, date: Optional[str] = None, search: Optional[str] = None):
-    result = list(meetings.values())
+async def list_meetings(
+    type: Optional[str] = None, 
+    date: Optional[str] = None, 
+    search: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(models.Meeting)
+    
     if type:
-        result = [m for m in result if m.get("type", "").lower() == type.lower()]
+        query = query.filter(models.Meeting.type.ilike(type))
     if date:
-        result = [m for m in result if m.get("date") == date]
+        query = query.filter(models.Meeting.date == date)
+    
+    results = query.all()
+    
     if search:
         q = search.lower()
-        result = [m for m in result if q in m.get("title", "").lower() or q in m.get("participants", "").lower()]
+        results = [m for m in results if q in (m.title or "").lower() or q in (m.participants or "").lower()]
 
-    result.sort(key=lambda m: (m.get("date", ""), m.get("time", "")))
-    return JSONResponse(content={"meetings": result, "total": len(result)})
+    results.sort(key=lambda m: (m.date or "", m.time or ""))
+
+    # Convert sqlalchemy objects to dictionaries
+    meetings_data = [{c.name: getattr(m, c.name) for c in m.__table__.columns} for m in results]
+    
+    return JSONResponse(content={"meetings": meetings_data, "total": len(results)})
 
 @router.post("", status_code=201)
-async def create_meeting(payload: MeetingCreate):
-    mid = next_mid()
-    meeting = {
-        "id": mid,
-        "title": payload.title,
-        "type": payload.type or "Internal",
-        "platform": payload.platform or "Google Meet",
-        "participants": payload.participants or "",
-        "date": payload.date,
-        "time": payload.time,
-        "duration": payload.duration or 30,
-        "link": payload.link or "",
-        "created_at": datetime.now().isoformat(),
-        "updated_at": datetime.now().isoformat(),
-    }
-    meetings[mid] = meeting
-    return JSONResponse(content={"message": "Meeting created successfully", "meeting": meeting}, status_code=201)
+async def create_meeting(payload: schemas.MeetingCreate, db: Session = Depends(get_db)):
+    db_meeting = models.Meeting(**payload.model_dump())
+    db.add(db_meeting)
+    db.commit()
+    db.refresh(db_meeting)
+    
+    meeting_dict = {c.name: getattr(db_meeting, c.name) for c in db_meeting.__table__.columns}
+    return JSONResponse(content={"message": "Meeting created successfully", "meeting": meeting_dict}, status_code=201)
 
 @router.get("/stats/summary")
-async def meetings_stats():
-    today = datetime.today().strftime("%Y-%m-%d")
-    all_m = list(meetings.values())
+async def meetings_stats(db: Session = Depends(get_db)):
+    import datetime
+    today = datetime.datetime.today().strftime("%Y-%m-%d")
+    
+    all_m = db.query(models.Meeting).all()
+    
     return JSONResponse(content={
         "total":    len(all_m),
-        "today":    sum(1 for m in all_m if m.get("date") == today),
-        "upcoming": sum(1 for m in all_m if m.get("date", "") > today),
-        "external": sum(1 for m in all_m if m.get("type") == "External"),
+        "today":    sum(1 for m in all_m if m.date == today),
+        "upcoming": sum(1 for m in all_m if m.date and m.date > today),
+        "external": sum(1 for m in all_m if m.type == "External"),
         "by_type": {
-            t: sum(1 for m in all_m if m.get("type") == t)
+            t: sum(1 for m in all_m if m.type == t)
             for t in ["Internal", "External", "Recurring", "Review"]
         },
     })
 
 @router.get("/{meeting_id}")
-async def get_meeting(meeting_id: int):
-    meeting = meetings.get(meeting_id)
+async def get_meeting(meeting_id: int, db: Session = Depends(get_db)):
+    meeting = db.query(models.Meeting).filter(models.Meeting.id == meeting_id).first()
     if not meeting:
         raise HTTPException(status_code=404, detail="Meeting not found")
-    return JSONResponse(content={"meeting": meeting})
+        
+    meeting_dict = {c.name: getattr(meeting, c.name) for c in meeting.__table__.columns}
+    return JSONResponse(content={"meeting": meeting_dict})
 
 @router.put("/{meeting_id}")
-async def update_meeting(meeting_id: int, payload: MeetingUpdate):
-    meeting = meetings.get(meeting_id)
-    if not meeting:
+async def update_meeting(meeting_id: int, payload: schemas.MeetingUpdate, db: Session = Depends(get_db)):
+    db_meeting = db.query(models.Meeting).filter(models.Meeting.id == meeting_id).first()
+    if not db_meeting:
         raise HTTPException(status_code=404, detail="Meeting not found")
-    update_data = payload.model_dump(exclude_none=True)
-    meeting.update(update_data)
-    meeting["updated_at"] = datetime.now().isoformat()
-    meetings[meeting_id] = meeting
-    return JSONResponse(content={"message": "Meeting updated successfully", "meeting": meeting})
+        
+    update_data = payload.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_meeting, key, value)
+        
+    db.commit()
+    db.refresh(db_meeting)
+    
+    meeting_dict = {c.name: getattr(db_meeting, c.name) for c in db_meeting.__table__.columns}
+    return JSONResponse(content={"message": "Meeting updated successfully", "meeting": meeting_dict})
 
 @router.patch("/{meeting_id}")
-async def patch_meeting(meeting_id: int, payload: MeetingUpdate):
-    return await update_meeting(meeting_id, payload)
+async def patch_meeting(meeting_id: int, payload: schemas.MeetingUpdate, db: Session = Depends(get_db)):
+    return await update_meeting(meeting_id, payload, db)
 
 @router.delete("/all")
-async def delete_all_meetings():
-    count = len(meetings)
-    meetings.clear()
+async def delete_all_meetings(db: Session = Depends(get_db)):
+    count = db.query(models.Meeting).delete()
+    db.commit()
     return JSONResponse(content={"message": f"Deleted all {count} meetings"})
 
 @router.delete("/{meeting_id}")
-async def delete_meeting(meeting_id: int):
-    if meeting_id not in meetings:
+async def delete_meeting(meeting_id: int, db: Session = Depends(get_db)):
+    db_meeting = db.query(models.Meeting).filter(models.Meeting.id == meeting_id).first()
+    if not db_meeting:
         raise HTTPException(status_code=404, detail="Meeting not found")
-    del meetings[meeting_id]
+        
+    db.delete(db_meeting)
+    db.commit()
     return JSONResponse(content={"message": "Meeting deleted successfully", "id": meeting_id})
