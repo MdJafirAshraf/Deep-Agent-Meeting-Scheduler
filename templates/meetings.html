@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Meetings - AI Meeting Scheduler{% endblock %}
+
+{% block content %}
+<main class="chat-main w-100" style="padding: 2rem; background-color: #f8fafc;">
+    <header class="chat-header border-0 mb-4 px-0 bg-transparent">
+        <div>
+            <h1 class="chat-title fs-3 fw-bolder">Meetings</h1>
+            <div class="chat-subtitle mt-1 text-muted">Total: 24 active meetings</div>
+        </div>
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn btn-outline-secondary bg-white text-dark rounded-pill fw-medium px-3 shadow-sm border-0 d-flex align-items-center gap-2">
+                <i class="fa-solid fa-download"></i> Export data
+            </button>
+            <button class="btn btn-primary rounded-pill px-4 shadow-sm fw-medium d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#meetingModal" style="background-color: #6366f1; border-color: #6366f1;">
+                <i class="fa-solid fa-plus"></i> Add meeting
+            </button>
+        </div>
+    </header>
+    
+    <!-- Filters / Toolbar -->
+    <div class="d-flex align-items-center mb-4 gap-2 flex-wrap">
+        <select class="form-select border-0 shadow-sm rounded-pill w-auto px-4 py-2 text-muted fw-medium" style="background-color: white;">
+            <option>Type</option>
+            <option>Internal</option>
+            <option>External</option>
+        </select>
+        <select class="form-select border-0 shadow-sm rounded-pill w-auto px-4 py-2 text-muted fw-medium" style="background-color: white;">
+            <option>Duration</option>
+            <option>30 min</option>
+            <option>60 min</option>
+            <option>90 min</option>
+        </select>
+        <button class="btn bg-white border-0 shadow-sm rounded-pill px-3 py-2 text-muted fw-medium d-flex align-items-center gap-2 ms-2">
+            <i class="fa-solid fa-sliders"></i> All filters
+        </button>
+
+        <!-- Right side actions -->
+        <div class="ms-auto d-flex gap-2">
+            <button class="btn bg-white border-0 shadow-sm rounded-3 text-muted" style="width: 40px; height: 40px;" title="Edit"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn bg-white border-0 shadow-sm rounded-3 text-muted" style="width: 40px; height: 40px;" title="Archive"><i class="fa-regular fa-folder"></i></button>
+            <button class="btn bg-white border-0 shadow-sm rounded-3 text-muted" style="width: 40px; height: 40px;" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
+        </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="bg-white rounded-4 shadow-sm w-100 overflow-visible" style="border: 1px solid var(--slate-200); position: relative;">
+        <table id="meetingsTable" class="table table-hover align-middle mb-0 w-100 premium-datatable">
+            <thead class="text-uppercase text-muted" style="font-size: 0.75rem; background: #fdfdfd;">
+                <tr>
+                    <th class="ps-4 border-bottom-0" style="width: 40px;"><input class="form-check-input row-checkbox-all" type="checkbox" style="background-color: #6366f1; border-color: #6366f1;"></th>
+                    <th class="border-bottom-0">ID <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
+                    <th class="border-bottom-0">MEETING TITLE <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
+                    <th class="border-bottom-0">TYPE <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
+                    <th class="border-bottom-0">DATE <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
+                    <th class="border-bottom-0">TIME <i class="fa-solid fa-sort ms-1 opacity-50"></i></th>
+                    <th class="border-bottom-0 text-center pe-4">ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody class="border-top-0">
+                <tr>
+                    <td class="ps-4"><input class="form-check-input row-checkbox" type="checkbox"></td>
+                    <td class="text-muted fw-medium">447</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 32px; height: 32px; font-size: 0.8rem;">DS</div>
+                            <span class="fw-bold text-dark">Design Sync</span>
+                        </div>
+                    </td>
+                    <td class="text-muted fw-medium">Internal</td>
+                    <td class="fw-medium">Oct 24, 2026</td>
+                    <td class="text-muted">10:00 AM</td>
+                    <td class="text-center pe-4">
+                        <div class="d-flex justify-content-center gap-3 align-items-center text-muted">
+                            <i class="fa-solid fa-video cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
+                            <i class="fa-regular fa-envelope cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
+                            <i class="fa-solid fa-ellipsis cursor-pointer" data-bs-toggle="dropdown"></i>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4 p-2 m-0 mt-2">
+                                <li><a class="dropdown-item py-2 text-muted fw-semibold rounded-3 mb-1" href="#"><i class="fa-solid fa-pen me-2 text-primary"></i> Edit</a></li>
+                                <li><a class="dropdown-item py-2 text-muted fw-semibold rounded-3" href="#"><i class="fa-regular fa-calendar-xmark me-2"></i> Reschedule</a></li>
+                                <li><hr class="dropdown-divider my-1 border-light"></li>
+                                <li><a class="dropdown-item py-2 text-danger fw-semibold rounded-3" href="#"><i class="fa-regular fa-trash-can me-2"></i> Delete</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+                <tr style="background-color: #f5f3ff;">
+                    <td class="ps-4"><input class="form-check-input row-checkbox" type="checkbox" checked style="background-color: #6366f1; border-color: #6366f1;"></td>
+                    <td class="text-muted fw-medium">877</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width: 32px; height: 32px; font-size: 0.8rem;">CC</div>
+                            <span class="fw-bold text-dark">Client Call: TechCorp</span>
+                        </div>
+                    </td>
+                    <td class="text-muted fw-medium">External</td>
+                    <td class="fw-medium">Oct 24, 2026</td>
+                    <td class="text-muted">02:30 PM</td>
+                    <td class="text-center pe-4">
+                        <div class="d-flex justify-content-center gap-3 align-items-center text-muted">
+                            <i class="fa-solid fa-phone cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
+                            <i class="fa-regular fa-envelope cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
+                            <i class="fa-solid fa-ellipsis cursor-pointer" data-bs-toggle="dropdown"></i>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="ps-4"><input class="form-check-input row-checkbox" type="checkbox"></td>
+                    <td class="text-muted fw-medium">556</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="https://i.pravatar.cc/150?img=5" class="rounded-circle shadow-sm" style="width: 32px; height: 32px; object-fit: cover;">
+                            <span class="fw-bold text-dark">1:1 with Emma</span>
+                        </div>
+                    </td>
+                    <td class="text-muted fw-medium">Internal</td>
+                    <td class="fw-medium">Oct 25, 2026</td>
+                    <td class="text-muted">11:00 AM</td>
+                    <td class="text-center pe-4">
+                        <div class="d-flex justify-content-center gap-3 align-items-center text-muted">
+                            <i class="fa-solid fa-video cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
+                            <i class="fa-regular fa-envelope cursor-pointer" style="transition: color 0.2s;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color=''"></i>
+                            <i class="fa-solid fa-ellipsis cursor-pointer" data-bs-toggle="dropdown"></i>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.premium-datatable th { border-bottom: 1px solid var(--slate-200) !important; padding: 18px 16px !important; color: var(--slate-500) !important; font-weight: 600 !important; }
+.premium-datatable td { padding: 16px 16px !important; border-bottom: 1px solid var(--slate-100); vertical-align: middle; border-bottom-color: #ede9fe; }
+.premium-datatable tbody tr { transition: background-color 0.2s; }
+.premium-datatable tbody tr:hover { background-color: var(--slate-50) !important; }
+.dataTables_wrapper .d-flex.justify-content-between { border-top: 1px solid var(--slate-100); background: #fcfcfd; }
+.dataTables_paginate .pagination { gap: 4px; }
+.dataTables_paginate .page-item .page-link { border: none; border-radius: 6px; color: var(--slate-600); padding: 6px 10px; font-weight: 600; font-size: 0.85rem; background: transparent; }
+.dataTables_paginate .page-item.active .page-link { background-color: #e0e7ff; color: #4f46e5; }
+.dataTables_paginate .page-item a.page-link:hover:not(.active) { background-color: var(--slate-100); color: var(--slate-900); }
+.dataTables_paginate .page-item.disabled .page-link { opacity: 0.4; background-color: transparent; }
+.form-check-input:checked { background-color: #6366f1; border-color: #6366f1; }
+.table-primary-subtle { background-color: #f5f3ff !important; }
+.dropdown-item:hover { background-color: var(--slate-50); }
+.dataTables_length, .dataTables_filter { display: none !important; }
+.dropdown-menu { box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1) !important; }
+</style>
+<script>
+$(document).ready(function() {
+    $('#meetingsTable').DataTable({
+        "dom": 't<"d-flex justify-content-between align-items-center px-4 py-3"<"text-muted small fw-medium"i><"d-flex align-items-center small"p>>',
+        "pagingType": "simple",
+        "pageLength": 10,
+        "language": {
+            "info": "_START_ to _END_ of _TOTAL_",
+            "paginate": { "previous": "<i class='fa-solid fa-chevron-left'></i>", "next": "Page 1 of 2 <i class='fa-solid fa-chevron-right ms-2'></i>" }
+        },
+        "columnDefs": [ { "orderable": false, "targets": [0, 6] } ]
+    });
+
+    $('.row-checkbox-all').on('change', function() {
+        var isChecked = $(this).prop('checked');
+        $('.row-checkbox').prop('checked', isChecked);
+        if (isChecked) $('.row-checkbox').closest('tr').css('background-color', '#f5f3ff');
+        else $('.row-checkbox').closest('tr').css('background-color', '');
+    });
+    $('.row-checkbox').on('change', function() {
+        if ($(this).prop('checked')) $(this).closest('tr').css('background-color', '#f5f3ff');
+        else $(this).closest('tr').css('background-color', '');
+    });
+});
+</script>
+{% endblock %}
