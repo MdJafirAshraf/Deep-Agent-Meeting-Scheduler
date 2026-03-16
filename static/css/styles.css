@@ -330,7 +330,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 24px;
+    padding: 20px 30px;
     background: rgba(255,255,255,.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -807,9 +807,10 @@ body {
 
 .detail-section {
     border-top: 1px solid var(--slate-100);
-    padding-top: 12px;
+    padding-top: 2px;
     margin-top: 8px;
 }
+
 .detail-section-title {
     display: flex;
     align-items: center;
@@ -943,104 +944,93 @@ body {
 }
 
 /* ════════════════════════════════════════════════
-   CHAT FOOTER / INPUT AREA
+   CHAT FOOTER / INPUT AREA — Single Row
    ════════════════════════════════════════════════ */
 .chat-footer {
     background: var(--white);
     border-top: 1px solid var(--slate-150);
     flex-shrink: 0;
+    padding: 16px 28px 20px;
 }
 
-.input-toolbar {
+/* ── Single row wrapper ── */
+.chat-input-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 10px 22px 0;
+    gap: 10px;
+    background: var(--slate-50);
+    border: 1.5px solid var(--slate-200);
+    border-radius: 14px;
+    padding: 6px 6px 6px 16px;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.chat-input-row:focus-within {
+    border-color: var(--brand-400);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(99,102,241,.10), var(--shadow-md);
 }
 
-.toolbar-btn {
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--slate-500);
-    background: transparent;
-    border: none;
-    padding: 5px 9px;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: all .18s;
-    display: inline-flex;
+/* ── Left icon ── */
+.chat-input-icon {
+    color: var(--brand-400);
+    font-size: 0.88rem;
+    flex-shrink: 0;
+    transition: color .2s;
+}
+.chat-input-row:focus-within .chat-input-icon {
+    color: var(--brand-500);
+}
+
+/* ── Text input ── */
+.chat-input-wrap {
+    flex: 1;
+    display: flex;
     align-items: center;
-    gap: 5px;
-    font-family: 'DM Sans', sans-serif;
+    gap: 10px;
+    min-width: 0;
 }
-.toolbar-btn:hover {
-    background: var(--brand-50);
-    color: var(--brand-600);
-}
-
-.toolbar-hint {
-    font-size: 0.71rem;
-    color: var(--slate-400);
-    font-weight: 500;
-}
-.toolbar-hint kbd {
-    background: var(--slate-100);
-    border: 1px solid var(--slate-200);
-    border-radius: 4px;
-    padding: 1px 5px;
-    font-size: 0.67rem;
-    font-family: inherit;
-    font-weight: 700;
-    color: var(--slate-600);
-}
-
-.chat-input-form {
-    padding: 6px 22px 2px;
-}
-.chat-input-form input {
-    width: 100%;
+.chat-input-wrap input {
+    flex: 1;
     border: none;
     outline: none;
-    font-size: 0.875rem;
-    color: var(--slate-800);
-    padding: 8px 0;
     background: transparent;
+    font-size: 0.875rem;
     font-weight: 500;
+    color: var(--slate-800);
     font-family: 'DM Sans', sans-serif;
+    min-width: 0;
 }
-.chat-input-form input::placeholder {
+.chat-input-wrap input::placeholder {
     color: var(--slate-400);
+    font-weight: 400;
 }
 
-.input-actions {
-    display: flex;
+/* ── Send button ── */
+.chat-send-btn {
+    display: inline-flex;
     align-items: center;
-    padding: 4px 22px 12px;
-    gap: 3px;
-}
-
-/* Override send-btn for assistant page (text button, not icon) */
-.input-actions .send-btn {
-    width: auto;
-    height: auto;
-    border-radius: 8px;
+    gap: 7px;
+    padding: 9px 20px;
+    border-radius: 10px;
     border: none;
     background: var(--grad-brand);
     color: white;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     font-weight: 700;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 7px 18px;
-    transition: all .2s var(--ease-out);
-    box-shadow: var(--shadow-brand);
     font-family: 'DM Sans', sans-serif;
+    transition: all .22s var(--ease-out);
+    box-shadow: var(--shadow-brand);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
-.input-actions .send-btn:hover {
+.chat-send-btn:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-brand-lg);
+}
+.chat-send-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-brand);
 }
 
 /* ════════════════════════════════════════════════

@@ -8,22 +8,17 @@
     <header class="chat-header">
         <div class="d-flex align-items-center gap-3">
             <div class="chat-header-avatar">
-                <i class="fa-solid fa-sparkles"></i>
+                <i class="fa-solid fa-robot"></i>
             </div>
             <div>
                 <h1 class="chat-title">AI Meeting Scheduler</h1>
                 <div class="chat-subtitle">
                     <span class="status-dot status-online"></span>
-                    <span>Always available</span>
-                    <span class="mx-1">•</span>
-                    <span class="text-muted">Powered by AI</span>
+                    <span>Available</span>
                 </div>
             </div>
         </div>
         <div class="header-actions">
-            <button class="header-action-btn" title="Video Call"><i class="fa-solid fa-video"></i></button>
-            <button class="header-action-btn" title="Voice Call"><i class="fa-solid fa-phone"></i></button>
-            <button class="header-action-btn" title="Snooze"><i class="fa-regular fa-clock"></i> Snooze</button>
             <span class="status-badge badge-active">Active</span>
             <button class="header-action-btn btn-new-meeting" data-bs-toggle="modal" data-bs-target="#meetingModal" title="New Meeting">
                 <i class="fa-solid fa-plus me-1"></i> New Meeting
@@ -44,7 +39,7 @@
         <!-- AI welcome message -->
         <div class="msg-row msg-ai">
             <div class="msg-avatar ai-avatar">
-                <i class="fa-solid fa-sparkles"></i>
+                <i class="fa-solid fa-robot"></i>
             </div>
             <div class="msg-block">
                 <div class="msg-bubble msg-bubble-ai">
@@ -78,7 +73,7 @@
     <!-- Typing indicator -->
     <div class="typing-bar d-none" id="typingIndicator">
         <div class="msg-avatar ai-avatar small-avatar">
-            <i class="fa-solid fa-sparkles"></i>
+            <i class="fa-solid fa-robot"></i>
         </div>
         <div class="typing-dots">
             <span></span><span></span><span></span>
@@ -88,21 +83,18 @@
 
     <!-- Chat Input Area -->
     <div class="chat-footer">
-        <div class="input-toolbar">
-            <button class="toolbar-btn" title="Chat mode"><i class="fa-regular fa-comment"></i> Chat <i class="fa-solid fa-chevron-down ms-1" style="font-size: 0.55rem;"></i></button>
-            <div class="toolbar-hint">Use <kbd>⌘K</kbd> for shortcuts</div>
-        </div>
-        <form id="chatForm" class="chat-input-form">
-            <input type="text" id="userInput" placeholder="Ask me to schedule, find time, or rearrange..." autocomplete="off">
-        </form>
-        <div class="input-actions">
-            <button type="button" class="toolbar-btn" title="Attach"><i class="fa-solid fa-bolt"></i></button>
-            <button type="button" class="toolbar-btn" title="Templates"><i class="fa-regular fa-note-sticky"></i></button>
-            <button type="button" class="toolbar-btn" title="Emoji"><i class="fa-regular fa-face-smile"></i></button>
-            <div class="ms-auto d-flex align-items-center gap-2">
-                <button type="submit" form="chatForm" class="send-btn">Send <i class="fa-solid fa-chevron-down ms-1" style="font-size: 0.6rem;"></i></button>
+        <form id="chatForm" class="chat-input-row">
+            <div class="chat-input-wrap">
+                <i class="fa-solid fa-robot chat-input-icon"></i>
+                <input type="text" id="userInput"
+                       placeholder="Ask me to schedule, find free time, or rearrange meetings..."
+                       autocomplete="off">
             </div>
-        </div>
+            <button type="submit" class="chat-send-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Send</span>
+            </button>
+        </form>
     </div>
 </main>
 
@@ -110,28 +102,11 @@
 <aside class="details-panel">
     <div class="details-header">
         <h6 class="fw-bold m-0">Details</h6>
-        <div class="d-flex gap-1">
-            <button class="icon-btn" title="Expand"><i class="fa-solid fa-up-right-and-down-left-from-center"></i></button>
-            <button class="icon-btn" title="Close panel"><i class="fa-solid fa-xmark"></i></button>
-        </div>
     </div>
 
     <div class="details-body">
-        <!-- Assignee / Team -->
-        <div class="detail-row">
-            <span class="detail-label">Assignee</span>
-            <span class="detail-value">
-                <img src="https://i.pravatar.cc/150?img=11" class="detail-avatar" alt="">
-                John Doe
-            </span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">Status</span>
-            <span class="detail-value"><span class="status-badge badge-active">Active</span></span>
-        </div>
-
         <!-- Meeting Attributes -->
-        <div class="detail-section">
+        <div>
             <div class="detail-section-title">
                 <span>MEETING ATTRIBUTES</span>
                 <i class="fa-solid fa-chevron-up"></i>
@@ -151,30 +126,6 @@
             <div class="detail-row">
                 <span class="detail-label"><i class="fa-regular fa-clock me-1 text-success opacity-50"></i> Free</span>
                 <span class="detail-value text-success fw-semibold">1.5 hrs</span>
-            </div>
-        </div>
-
-        <!-- Smart Insights -->
-        <div class="detail-section">
-            <div class="detail-section-title">
-                <span><i class="fa-solid fa-wand-magic-sparkles me-1 text-primary"></i> SMART INSIGHTS</span>
-                <i class="fa-solid fa-chevron-up"></i>
-            </div>
-            <div class="insight-card insight-card-purple" onclick="sendQuickAction('Schedule 1:1 with Emma')">
-                <div class="insight-icon"><i class="fa-solid fa-user-clock"></i></div>
-                <div>
-                    <div class="insight-title">Follow-up Due</div>
-                    <div class="insight-desc">You haven't met with <strong>Emma</strong> in 3 weeks</div>
-                </div>
-                <i class="fa-solid fa-plus ms-auto insight-action"></i>
-            </div>
-            <div class="insight-card insight-card-emerald" onclick="sendQuickAction('Block 2pm for Focus')">
-                <div class="insight-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                <div>
-                    <div class="insight-title">Protect Time</div>
-                    <div class="insight-desc">3-hour gap tomorrow — block for deep work?</div>
-                </div>
-                <i class="fa-solid fa-plus ms-auto insight-action"></i>
             </div>
         </div>
 

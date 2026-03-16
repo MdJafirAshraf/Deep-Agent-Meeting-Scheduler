@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             row.innerHTML = `
                 <div class="msg-avatar ai-avatar">
-                    <i class="fa-solid fa-sparkles"></i>
+                    <i class="fa-solid fa-robot"></i>
                 </div>
                 <div class="msg-block">
                     <div class="msg-bubble msg-bubble-ai">
