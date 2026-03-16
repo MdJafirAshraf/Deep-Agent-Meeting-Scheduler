@@ -3,4 +3,4 @@ venv
 .env
 *.db
 
-app\core\cred.json
+app/core/cred.json
