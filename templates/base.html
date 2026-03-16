@@ -32,7 +32,7 @@
                 <div class="sidebar-section-label">Main</div>
                 <a href="/" class="nav-item {% if active_page == 'assistant' %}active{% endif %}">
                     <i class="fa-solid fa-robot"></i>
-                    <span>Assistant</span>
+                    <span>AI Assistant</span>
                 </a>
                 <a href="/meetings" class="nav-item {% if active_page == 'meetings' %}active{% endif %}">
                     <i class="fa-regular fa-calendar-check"></i>
@@ -50,7 +50,7 @@
 
             <div class="sidebar-footer">
                 <div class="sidebar-nav">
-                    <a href="#" class="nav-item">
+                    <a href="/settings" class="nav-item {% if active_page == 'settings' %}active{% endif %}">
                         <i class="fa-solid fa-gear"></i>
                         <span>Settings</span>
                     </a>
@@ -64,7 +64,6 @@
                         <span class="user-name">Alex Johnson</span>
                         <span class="user-plan">Pro Account</span>
                     </div>
-                    <i class="fa-solid fa-chevron-right" style="font-size:.65rem;color:var(--slate-300);margin-left:auto;"></i>
                 </div>
             </div>
         </aside>

@@ -21,6 +21,6 @@ async def calendar_page(request: Request):
 async def contacts_page(request: Request):
     return templates.TemplateResponse("contacts.html", {"request": request, "active_page": "contacts"})
 
-@router.get("/activity_logs", response_class=HTMLResponse)
-async def activity_logs_page(request: Request):
-    return templates.TemplateResponse("activity_logs.html", {"request": request, "active_page": "activity_logs"})
+@router.get("/settings", response_class=HTMLResponse)
+async def settings_page(request: Request):
+    return templates.TemplateResponse("settings.html", {"request": request, "active_page": "settings"})
