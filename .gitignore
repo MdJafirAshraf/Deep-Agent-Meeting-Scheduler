@@ -3,4 +3,6 @@ venv
 .env
 *.db
 
-app/core/cred.json
+# Google API credentials and token files
+credentials.json
+token.json

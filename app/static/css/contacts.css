@@ -218,7 +218,7 @@
 .table-container {
     background: var(--white); border-radius: 16px;
     border: 1px solid rgba(226,232,240,.8);
-    overflow-x: auto; overflow-y: visible;
+    overflow-y: visible;
     box-shadow: var(--shadow-sm);
     animation: fadeSlideIn .45s var(--ease-out) .25s both;
     flex-shrink: 0;

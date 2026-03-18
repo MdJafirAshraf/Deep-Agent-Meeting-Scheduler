@@ -5,12 +5,14 @@ from sqlalchemy.orm import Session
 from app.models import models
 from app.schemas import MeetingCreate, MeetingUpdate
 
+from app.clients.calendar.google_calendar import GoogleCalendarClient
 
 class MeetingService:
     """Business logic for meetings."""
 
     def __init__(self, db: Session):
         self.db = db
+        self.calendar = GoogleCalendarClient()
 
     def list_meetings(
         self,
@@ -18,6 +20,10 @@ class MeetingService:
         date: Optional[str] = None,
         search: Optional[str] = None,
     ) -> List[dict]:
+        # use google calendar
+        self.calendar.get_events()
+
+
         query = self.db.query(models.Meeting)
 
         if type:
