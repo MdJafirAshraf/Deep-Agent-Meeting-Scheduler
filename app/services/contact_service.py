@@ -14,19 +14,9 @@ class ContactService:
 
     def list_contacts(
         self,
-        role: Optional[str] = None,
-        company: Optional[str] = None,
-        status: Optional[str] = None,
         search: Optional[str] = None,
     ) -> List[dict]:
         query = self.db.query(models.Contact)
-
-        if role:
-            query = query.filter(models.Contact.role.ilike(role))
-        if company:
-            query = query.filter(models.Contact.company.ilike(company))
-        if status:
-            query = query.filter(models.Contact.status.ilike(status))
 
         results = query.all()
 
@@ -37,7 +27,6 @@ class ContactService:
                 for c in results
                 if q in ((c.first_name or "") + " " + (c.last_name or "")).lower()
                 or q in (c.email or "").lower()
-                or q in (c.company or "").lower()
             ]
 
         results.sort(key=lambda c: (c.last_name or "", c.first_name or ""))
@@ -84,19 +73,7 @@ class ContactService:
         return count
 
     def stats_summary(self) -> dict:
-        all_c = self.db.query(models.Contact).all()
-
-        companies = set(c.company for c in all_c if c.company)
-        by_role = {}
-        for c in all_c:
-            r = c.role or "Other"
-            by_role[r] = by_role.get(r, 0) + 1
-
+        total = self.db.query(models.Contact).count()
         return {
-            "total": len(all_c),
-            "active": sum(1 for c in all_c if c.status == "Active"),
-            "inactive": sum(1 for c in all_c if c.status == "Inactive"),
-            "pending": sum(1 for c in all_c if c.status == "Pending"),
-            "companies": len(companies),
-            "by_role": by_role,
+            "total": total,
         }

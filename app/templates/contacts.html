@@ -29,61 +29,12 @@
         </div>
     </div>
 
-    <!-- ── Stats ── -->
-    <div class="stats-row">
-        <div class="stat-card sc-blue">
-            <div class="stat-icon blue"><i class="fa-solid fa-users"></i></div>
-            <div>
-                <div class="stat-val" id="statTotal">—</div>
-                <div class="stat-label">Total Contacts</div>
-            </div>
-        </div>
-        <div class="stat-card sc-emerald">
-            <div class="stat-icon emerald"><i class="fa-solid fa-circle-check"></i></div>
-            <div>
-                <div class="stat-val" id="statActive">—</div>
-                <div class="stat-label">Active</div>
-            </div>
-        </div>
-        <div class="stat-card sc-purple">
-            <div class="stat-icon purple"><i class="fa-solid fa-building"></i></div>
-            <div>
-                <div class="stat-val" id="statCompanies">—</div>
-                <div class="stat-label">Companies</div>
-            </div>
-        </div>
-        <div class="stat-card sc-amber">
-            <div class="stat-icon amber"><i class="fa-solid fa-globe"></i></div>
-            <div>
-                <div class="stat-val" id="statExternal">—</div>
-                <div class="stat-label">External</div>
-            </div>
-        </div>
-    </div>
-
     <!-- ── Toolbar ── -->
     <div class="contacts-toolbar">
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" placeholder="Search name, email, company…">
+            <input type="text" id="searchInput" placeholder="Search name or email…">
         </div>
-        <select class="toolbar-filter-select" id="fRole">
-            <option value="">All Roles</option>
-            <option value="Developer">Developer</option>
-            <option value="Designer">Designer</option>
-            <option value="Marketing Lead">Marketing</option>
-            <option value="Product Manager">Product</option>
-            <option value="Operations">Operations</option>
-        </select>
-        <select class="toolbar-filter-select" id="fCompany">
-            <option value="">All Companies</option>
-        </select>
-        <select class="toolbar-filter-select" id="fStatus">
-            <option value="">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-            <option value="Pending">Pending</option>
-        </select>
 
         <!-- Bulk bar -->
         <div class="bulk-bar" id="bulkBar">
@@ -112,11 +63,7 @@
                         <input type="checkbox" class="form-check-input" id="selAll" style="width:16px;height:16px;cursor:pointer;accent-color:#6366f1;" onchange="toggleAll(this)">
                     </th>
                     <th>Contact</th>
-                    <th>Role</th>
-                    <th>Company</th>
                     <th>Phone</th>
-                    <th>Status</th>
-                    <th>Last Contact</th>
                     <th style="text-align:right; padding-right:20px !important;">Actions</th>
                 </tr>
             </thead>
@@ -147,8 +94,6 @@
             <div class="drawer-section-title">Contact Info</div>
             <div class="drawer-field"><span class="df-label">Email</span><span class="df-val" id="dEmail">—</span></div>
             <div class="drawer-field"><span class="df-label">Phone</span><span class="df-val" id="dPhone">—</span></div>
-            <div class="drawer-field"><span class="df-label">Company</span><span class="df-val" id="dCompany">—</span></div>
-            <div class="drawer-field"><span class="df-label">Status</span><span class="df-val" id="dStatus">—</span></div>
         </div>
         <div class="drawer-section">
             <div class="drawer-section-title">Quick Actions</div>
@@ -209,43 +154,6 @@
                         <div class="f-group mb-0">
                             <label class="f-label">Phone</label>
                             <input type="text" class="f-input" id="fPhone" placeholder="+1 (555) 000-0000">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="f-group mb-0">
-                            <label class="f-label">Role</label>
-                            <select class="f-input" id="fRole2">
-                                <option value="Developer">Developer</option>
-                                <option value="Designer">Designer</option>
-                                <option value="Marketing Lead">Marketing Lead</option>
-                                <option value="Product Manager">Product Manager</option>
-                                <option value="Operations">Operations</option>
-                                <option value="Director">Director</option>
-                                <option value="Executive">Executive</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="f-group mb-0">
-                            <label class="f-label">Company</label>
-                            <input type="text" class="f-input" id="fCompany2" placeholder="TechCorp">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="f-group mb-0">
-                            <label class="f-label">Status</label>
-                            <select class="f-input" id="fStatus2">
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
-                                <option value="Pending">Pending</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="f-group mb-0">
-                            <label class="f-label">Last Contact Date</label>
-                            <input type="date" class="f-input" id="fLastContact">
                         </div>
                     </div>
                     <div class="col-12">

@@ -12,14 +12,11 @@ router = APIRouter(prefix="/api/contacts", tags=["contacts"])
 
 @router.get("", response_class=JSONResponse)
 async def list_contacts(
-    role: Optional[str] = None,
-    company: Optional[str] = None,
-    status: Optional[str] = None,
     search: Optional[str] = None,
     db: Session = Depends(get_db),
 ):
     service = ContactService(db)
-    contacts = service.list_contacts(role=role, company=company, status=status, search=search)
+    contacts = service.list_contacts(search=search)
     return JSONResponse(content={"contacts": contacts, "total": len(contacts)})
 
 

@@ -33,11 +33,6 @@ class Contact(Base):
     last_name = Column(String, index=True)
     email = Column(String, default="")
     phone = Column(String, default="")
-    role = Column(String, default="Developer")
-    company = Column(String, default="")
-    status = Column(String, default="Active")
-    last_contact = Column(String, nullable=True)
-    avatar_url = Column(String, default="")
     notes = Column(Text, default="")
     created_at = Column(String, default=lambda: datetime.datetime.now().isoformat())
     updated_at = Column(

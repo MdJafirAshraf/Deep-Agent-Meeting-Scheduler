@@ -34,10 +34,11 @@ class GoogleCalendarClient(BaseCalendarClient):
 
     def get_events(self):
         now = datetime.datetime.utcnow().isoformat() + 'Z'
-        print('Getting List of 10 events')
-        events_result = self.service.events().list(calendarId='primary', timeMin=now,
-                                            maxResults=10, singleEvents=True,
-                                            orderBy='startTime').execute()
+        events_result = self.service.events().list(calendarId='primary', 
+            timeMin=now,
+            maxResults=10, 
+            singleEvents=True,
+            orderBy='startTime').execute()
         events = events_result.get('items', [])
 
         if not events:
@@ -46,7 +47,31 @@ class GoogleCalendarClient(BaseCalendarClient):
             start = event['start'].get('dateTime', event['start'].get('date'))
             print(start, event['summary'])
 
-    def create_event(self, title, start_time, end_time, attendees):
+    def create_event(self, meeting):
+        event = {
+            'summary': meeting.title,
+            'location': meeting.location,
+            'description': meeting.description,
+            'start': {
+                'dateTime': '2015-05-28T09:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'end': {
+                'dateTime': '2015-05-28T17:00:00-07:00',
+                'timeZone': 'America/Los_Angeles',
+            },
+            'attendees': [
+                {'email': 'lpage@example.com'},
+                {'email': 'sbrin@example.com'},
+            ],
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                {'method': 'email', 'minutes': 24 * 60},
+                {'method': 'popup', 'minutes': 10},
+                ],
+            },
+            }
         print("Creating event in Google Calendar")
 
     def delete_event(self, event_id):

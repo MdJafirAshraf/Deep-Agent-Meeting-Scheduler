@@ -20,10 +20,6 @@ class MeetingService:
         date: Optional[str] = None,
         search: Optional[str] = None,
     ) -> List[dict]:
-        # use google calendar
-        self.calendar.get_events()
-
-
         query = self.db.query(models.Meeting)
 
         if type:
@@ -46,10 +42,15 @@ class MeetingService:
         return [{c.name: getattr(m, c.name) for c in m.__table__.columns} for m in results]
 
     def create_meeting(self, payload: MeetingCreate) -> dict:
+        # create event in meeting database
         db_meeting = models.Meeting(**payload.model_dump())
         self.db.add(db_meeting)
         self.db.commit()
         self.db.refresh(db_meeting)
+
+        # create event in google calendar
+        self.calendar.create_event(db_meeting)
+
         return {c.name: getattr(db_meeting, c.name) for c in db_meeting.__table__.columns}
 
     def get_meeting(self, meeting_id: int) -> Optional[dict]:

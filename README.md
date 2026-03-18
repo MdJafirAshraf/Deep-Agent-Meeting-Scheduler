@@ -65,3 +65,66 @@ Deep-Agent-Meeting-Scheduler/
 - Integration seamlessly with LLM inference engines (OpenAI, Gemini) inside `main.py`
 - Persistent Database interactions
 - Advanced MCP routing and real Calendar syncs (Google Workspace/Office 365)
+
+```
+Deep-Agent-Meeting-Scheduler
+├─ .python-version
+├─ app
+│  ├─ api
+│  │  ├─ v1
+│  │  │  ├─ api.py
+│  │  │  ├─ endpoints
+│  │  │  │  ├─ chat.py
+│  │  │  │  ├─ contacts.py
+│  │  │  │  ├─ meetings.py
+│  │  │  │  ├─ pages.py
+│  │  │  │  └─ __init__.py
+│  │  │  └─ __init__.py
+│  │  └─ __init__.py
+│  ├─ core
+│  │  ├─ config.py
+│  │  └─ __init__.py
+│  ├─ db
+│  │  ├─ seed.py
+│  │  ├─ session.py
+│  │  └─ __init__.py
+│  ├─ main.py
+│  ├─ models
+│  │  ├─ models.py
+│  │  └─ __init__.py
+│  ├─ schemas
+│  │  ├─ schemas.py
+│  │  └─ __init__.py
+│  ├─ services
+│  │  ├─ chat_service.py
+│  │  ├─ contact_service.py
+│  │  ├─ meeting_service.py
+│  │  └─ __init__.py
+│  ├─ static
+│  │  ├─ css
+│  │  │  ├─ calendar.css
+│  │  │  ├─ contacts.css
+│  │  │  ├─ meetings.css
+│  │  │  ├─ settings.css
+│  │  │  └─ styles.css
+│  │  └─ js
+│  │     ├─ calendar.js
+│  │     ├─ contacts.js
+│  │     ├─ meetings.js
+│  │     ├─ script.js
+│  │     └─ settings.js
+│  ├─ templates
+│  │  ├─ base.html
+│  │  ├─ calendar.html
+│  │  ├─ contacts.html
+│  │  ├─ index.html
+│  │  ├─ meetings.html
+│  │  └─ settings.html
+│  └─ __init__.py
+├─ pyproject.toml
+├─ README.md
+├─ requirements.txt
+├─ run.py
+└─ uv.lock
+
+```
