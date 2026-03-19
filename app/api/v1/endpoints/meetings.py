@@ -18,7 +18,7 @@ async def list_meetings(
     db: Session = Depends(get_db),
 ):
     service = MeetingService(db)
-    meetings = service.list_meetings(type=type, date=date, search=search)
+    meetings = service.list_meetings(date=date, search=search)
     return JSONResponse(content={"meetings": meetings, "total": len(meetings)})
 
 

@@ -1,4 +1,7 @@
-import os, datetime
+import json
+import os
+import datetime
+
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -7,72 +10,87 @@ from googleapiclient.errors import HttpError
 
 from .base_calendar import BaseCalendarClient
 
+
 class GoogleCalendarClient(BaseCalendarClient):
 
     def __init__(self):
         creds = None
-        SCOPES = ["https://www.googleapis.com/auth/calendar"]
-        CREDENTIALS_FILE = 'app\clients\calendar\credentials.json'
+        SCOPES           = ["https://www.googleapis.com/auth/calendar"]
+        CREDENTIALS_FILE = "app/clients/calendar/credentials.json"
 
-        # Try to load existing token
         if os.path.exists("token.json"):
             creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
-        # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
                 creds.refresh(Request())
             else:
-                flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
+                flow  = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
                 creds = flow.run_local_server(port=0)
-
-            # Save the credentials for the next run
             with open("token.json", "w") as token:
                 token.write(creds.to_json())
 
         self.service = build("calendar", "v3", credentials=creds)
 
-    def get_events(self):
-        now = datetime.datetime.utcnow().isoformat() + 'Z'
-        events_result = self.service.events().list(calendarId='primary', 
-            timeMin=now,
-            maxResults=10, 
-            singleEvents=True,
-            orderBy='startTime').execute()
-        events = events_result.get('items', [])
-
-        if not events:
-            print('No upcoming events found.')
-        for event in events:
-            start = event['start'].get('dateTime', event['start'].get('date'))
-            print(start, event['summary'])
+    def get_events(self, start_time=None, end_time=None):
+        now = datetime.datetime.utcnow().isoformat() + "Z"
+        result = (
+            self.service.events()
+            .list(calendarId="primary", timeMin=now, maxResults=10,
+                  singleEvents=True, orderBy="startTime")
+            .execute()
+        )
+        for event in result.get("items", []):
+            start = event["start"].get("dateTime", event["start"].get("date"))
+            print(start, event["summary"])
 
     def create_event(self, meeting):
-        event = {
-            'summary': meeting.title,
-            'location': meeting.location,
-            'description': meeting.description,
-            'start': {
-                'dateTime': '2015-05-28T09:00:00-07:00',
-                'timeZone': 'America/Los_Angeles',
-            },
-            'end': {
-                'dateTime': '2015-05-28T17:00:00-07:00',
-                'timeZone': 'America/Los_Angeles',
-            },
-            'attendees': [
-                {'email': 'lpage@example.com'},
-                {'email': 'sbrin@example.com'},
-            ],
-            'reminders': {
-                'useDefault': False,
-                'overrides': [
-                {'method': 'email', 'minutes': 24 * 60},
-                {'method': 'popup', 'minutes': 10},
-                ],
-            },
-            }
-        print("Creating event in Google Calendar")
+        timezone = getattr(meeting, "timezone", None) or "UTC"
 
-    def delete_event(self, event_id):
-        print("Deleting event from Google Calendar")
+        # Fallback: build datetime from date + time if ISO fields empty
+        start_dt = getattr(meeting, "start_datetime", "") or ""
+        if not start_dt and meeting.date and meeting.time:
+            start_dt = f"{meeting.date}T{meeting.time}:00"
+
+        end_dt = getattr(meeting, "end_datetime", "") or ""
+        if not end_dt and start_dt:
+            base   = datetime.datetime.fromisoformat(start_dt)
+            end_dt = (base + datetime.timedelta(minutes=getattr(meeting, "duration", 30) or 30)).isoformat()
+
+        # Attendees from comma-separated participants string
+        attendees = []
+        for email in (getattr(meeting, "participants", "") or "").split(","):
+            email = email.strip()
+            if email:
+                attendees.append({"email": email})
+
+        # Reminders — always useDefault (per product decision)
+        reminders = {"useDefault": True, "overrides": []}
+
+        event = {
+            "summary":     meeting.title,
+            "description": getattr(meeting, "description", "") or "",
+            "start":       {"dateTime": start_dt, "timeZone": timezone},
+            "end":         {"dateTime": end_dt,   "timeZone": timezone},
+            "attendees":   attendees,
+            "reminders":   reminders,
+        }
+
+        try:
+            created = (
+                self.service.events()
+                .insert(calendarId="primary", body=event, sendUpdates="all")
+                .execute()
+            )
+            print(f"Event created: {created.get('htmlLink')}")
+            return created
+        except HttpError as error:
+            print(f"Google Calendar API error: {error}")
+            return None
+
+    def delete_event(self, event_id: str):
+        try:
+            self.service.events().delete(calendarId="primary", eventId=event_id).execute()
+            print(f"Event {event_id} deleted.")
+        except HttpError as error:
+            print(f"Google Calendar API error: {error}")

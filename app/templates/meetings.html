@@ -3,20 +3,24 @@
 {% block title %}Meetings - AI Meeting Scheduler{% endblock %}
 
 {% block head %}
+<!-- Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+<!-- Tagify -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
 <link rel="stylesheet" href="{{ url_for('static', path='css/meetings.css') }}">
-<script src="{{ url_for('static', path='js/meetings.js') }}"></script>
 {% endblock %}
 
 {% block content %}
 <main class="chat-main w-100 meetings-root">
 
-    <!-- ── Page Header ── -->
+    <!-- ── Header ── -->
     <div class="meetings-header">
         <div class="meetings-header-left">
             <h1>Meetings</h1>
             <div class="sub">
                 <span class="sub-dot"></span>
-                <span id="totalCount">Loading...</span> total meetings
+                <span id="totalCount">—</span> total meetings
             </div>
         </div>
         <div class="header-btn-group">
@@ -29,57 +33,17 @@
         </div>
     </div>
 
-    <!-- ── Stats Row ── -->
-    <div class="stats-row">
-        <div class="stat-card sc-blue">
-            <div class="stat-icon blue"><i class="fa-regular fa-calendar-days"></i></div>
-            <div class="stat-info">
-                <div class="stat-val" id="statTotal">—</div>
-                <div class="stat-label">Total Meetings</div>
-            </div>
-        </div>
-        <div class="stat-card sc-emerald">
-            <div class="stat-icon emerald"><i class="fa-solid fa-circle-check"></i></div>
-            <div class="stat-info">
-                <div class="stat-val" id="statToday">—</div>
-                <div class="stat-label">Today</div>
-            </div>
-        </div>
-        <div class="stat-card sc-purple">
-            <div class="stat-icon purple"><i class="fa-solid fa-clock-rotate-left"></i></div>
-            <div class="stat-info">
-                <div class="stat-val" id="statUpcoming">—</div>
-                <div class="stat-label">Upcoming</div>
-            </div>
-        </div>
-        <div class="stat-card sc-amber">
-            <div class="stat-icon amber"><i class="fa-solid fa-users"></i></div>
-            <div class="stat-info">
-                <div class="stat-val" id="statExternal">—</div>
-                <div class="stat-label">External</div>
-            </div>
-        </div>
-    </div>
-
     <!-- ── Toolbar ── -->
     <div class="meetings-toolbar">
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" id="searchInput" placeholder="Search meetings...">
         </div>
-        <select class="toolbar-filter-select" id="filterType">
-            <option value="">All Types</option>
-            <option value="Internal">Internal</option>
-            <option value="External">External</option>
-            <option value="Recurring">Recurring</option>
-            <option value="Review">Review</option>
-        </select>
         <select class="toolbar-filter-select" id="filterStatus">
             <option value="">All Status</option>
             <option value="Today">Today</option>
             <option value="Upcoming">Upcoming</option>
-            <option value="Completed">Completed</option>
-            <option value="Cancelled">Cancelled</option>
+            <option value="Past">Past</option>
         </select>
         <select class="toolbar-filter-select" id="filterDuration">
             <option value="">Any Duration</option>
@@ -89,7 +53,7 @@
             <option value="90">90+ min</option>
         </select>
 
-        <!-- Bulk actions (hidden until selection) -->
+        <!-- Bulk actions -->
         <div class="bulk-actions" id="bulkActions">
             <span class="bulk-count" id="bulkCount">0</span> selected
             <button class="toolbar-icon-btn" title="Delete Selected" onclick="bulkDelete()">
@@ -113,27 +77,24 @@
             <thead>
                 <tr>
                     <th style="width:42px;" class="ps-3">
-                        <input type="checkbox" class="form-check-input" id="selectAll" style="width:16px;height:16px;cursor:pointer;accent-color:#6366f1;">
+                        <input type="checkbox" class="form-check-input" id="selectAll"
+                               style="width:16px;height:16px;cursor:pointer;accent-color:#6366f1;">
                     </th>
                     <th>Meeting</th>
-                    <th>Type</th>
                     <th>Date &amp; Time</th>
                     <th>Duration</th>
-                    <th>Platform</th>
                     <th>Status</th>
                     <th>Participants</th>
-                    <th style="width:120px; text-align:center;">Actions</th>
+                    <th style="width:100px; text-align:center;">Actions</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
-                <!-- Rows injected by JS -->
-            </tbody>
+            <tbody id="tableBody"></tbody>
         </table>
     </div>
 
 </main>
 
-<!-- ══════════ ADD / EDIT MODAL — Compact ══════════ -->
+<!-- ══════════ ADD / EDIT MODAL ══════════ -->
 <div class="modal fade modal-meetings" id="meetingCrudModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width:480px;">
         <div class="modal-content">
@@ -144,97 +105,69 @@
             <div class="modal-body">
                 <input type="hidden" id="editMeetingId">
 
-                <!-- Event Name -->
+                <!-- Title -->
                 <div class="field-group">
                     <label class="field-label">Event name</label>
                     <input type="text" class="field-input" id="fTitle" placeholder="Enter meeting name">
                 </div>
 
-                <!-- Date + Color dots inline row -->
+                <!-- Date row — Flatpickr date picker -->
                 <div class="form-inline-row">
                     <i class="fa-regular fa-calendar row-icon"></i>
-                    <input type="date" class="field-input" id="fDate" style="width:auto;flex:1;border-radius:10px;padding:7px 12px;font-size:0.84rem;font-weight:600;">
+                    <input class="field-input fp-date" id="fDate"
+                           placeholder="Pick a date"
+                           style="width:auto;flex:1;border-radius:10px;padding:7px 12px;font-size:0.84rem;font-weight:600;cursor:pointer;"
+                           readonly>
                     <div class="color-dots">
-                        <div class="color-dot cd-blue selected" data-color="blue" onclick="selectColor(this)" title="Blue"></div>
-                        <div class="color-dot cd-green" data-color="green" onclick="selectColor(this)" title="Green"></div>
-                        <div class="color-dot cd-purple" data-color="purple" onclick="selectColor(this)" title="Purple"></div>
-                        <div class="color-dot cd-amber" data-color="amber" onclick="selectColor(this)" title="Amber"></div>
+                        <div class="color-dot cd-blue selected" data-color="blue"   onclick="selectColor(this)" title="Blue"></div>
+                        <div class="color-dot cd-green"         data-color="green"  onclick="selectColor(this)" title="Green"></div>
+                        <div class="color-dot cd-purple"        data-color="purple" onclick="selectColor(this)" title="Purple"></div>
+                        <div class="color-dot cd-amber"         data-color="amber"  onclick="selectColor(this)" title="Amber"></div>
                     </div>
                 </div>
 
-                <!-- Time range inline row -->
+                <!-- Time range row — Flatpickr time pickers -->
                 <div class="form-inline-row" style="border-top:none; margin-top:-8px;">
                     <i class="fa-regular fa-clock row-icon"></i>
-                    <input type="time" class="form-time-input" id="fTime" value="09:00">
+                    <input class="form-time-input fp-time" id="fTime"    placeholder="09:00" readonly style="cursor:pointer;">
                     <span class="arrow-sep">→</span>
-                    <input type="time" class="form-time-input" id="fTimeEnd" value="10:00">
-                    <!-- Duration hidden, computed from time range -->
-                    <select id="fDuration" style="display:none;">
-                        <option value="15">15 minutes</option>
-                        <option value="30" selected>30 minutes</option>
-                        <option value="45">45 minutes</option>
-                        <option value="60">1 hour</option>
-                        <option value="90">1.5 hours</option>
-                        <option value="120">2 hours</option>
+                    <input class="form-time-input fp-time" id="fTimeEnd" placeholder="10:00" readonly style="cursor:pointer;">
+                </div>
+
+                <!-- Timezone -->
+                <div class="field-group">
+                    <label class="field-label">Timezone</label>
+                    <select class="field-input" id="fTimezone" style="padding:9px 12px;">
+                        <option value="UTC">UTC</option>
+                        <option value="America/New_York">America/New_York (ET)</option>
+                        <option value="America/Chicago">America/Chicago (CT)</option>
+                        <option value="America/Denver">America/Denver (MT)</option>
+                        <option value="America/Los_Angeles">America/Los_Angeles (PT)</option>
+                        <option value="Europe/London">Europe/London (GMT)</option>
+                        <option value="Europe/Paris">Europe/Paris (CET)</option>
+                        <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                        <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                        <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
                     </select>
                 </div>
 
-                <!-- Type + Platform row -->
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <label class="field-label">Type</label>
-                        <select class="field-input" id="fType" style="padding:9px 12px;">
-                            <option value="Internal">Internal</option>
-                            <option value="External">External</option>
-                            <option value="Recurring">Recurring</option>
-                            <option value="Review">Review</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <label class="field-label">Platform</label>
-                        <select class="field-input" id="fPlatform" style="padding:9px 12px;">
-                            <option value="Google Meet">Google Meet</option>
-                            <option value="Zoom">Zoom</option>
-                            <option value="Teams">Microsoft Teams</option>
-                            <option value="Phone">Phone Call</option>
-                            <option value="In-person">In-person</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Participants + Link row -->
+                <!-- Participants — Tagify tags control connected to contacts -->
                 <div class="field-group">
                     <label class="field-label">Participants</label>
-                    <input type="text" class="field-input" id="fParticipants" placeholder="alice@co.com, bob@co.com">
-                </div>
-
-                <!-- Notification + Reminder row -->
-                <div class="form-notify-row">
-                    <div class="form-notify-group">
-                        <label class="field-label">Get notified on</label>
-                        <div class="notify-btn-group">
-                            <button type="button" class="notify-btn active" onclick="toggleNotify(this)">
-                                <i class="fa-brands fa-slack" style="color:#4a154b;"></i> Slack
-                            </button>
-                            <button type="button" class="notify-btn" onclick="toggleNotify(this)">
-                                <i class="fa-regular fa-envelope" style="color:#64748b;"></i> Email
-                            </button>
-                        </div>
-                    </div>
-                    <div class="form-notify-group">
-                        <label class="field-label">Set reminder</label>
-                        <select class="field-input" style="padding:8px 12px; font-size:0.82rem;">
-                            <option>1 hour before event</option>
-                            <option>30 min before</option>
-                            <option>15 min before</option>
-                            <option>On event day</option>
-                        </select>
+                    <!-- hidden real input, Tagify attaches to this -->
+                    <input type="text" id="fParticipants" class="field-input"
+                           placeholder="Type or pick email, press Enter or comma">
+                    <div class="field-hint" style="font-size:0.7rem;color:var(--slate-400);margin-top:5px;">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        Type an email and press <kbd>Enter</kbd> or <kbd>,</kbd> — or pick from contacts.
                     </div>
                 </div>
 
-                <!-- Description textarea -->
+                <!-- Description -->
                 <div class="field-group mb-0">
-                    <textarea class="field-textarea" id="fLink" placeholder="Add description or meeting link..." rows="3"></textarea>
+                    <label class="field-label">Description</label>
+                    <textarea class="field-textarea" id="fDescription"
+                              placeholder="Add agenda or notes..." rows="3"></textarea>
                 </div>
             </div>
             <div class="modal-footer justify-content-end gap-2">
@@ -267,4 +200,12 @@
 
 <!-- Toast container -->
 <div class="toast-stack" id="toastStack"></div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Tagify JS -->
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
+<script src="{{ url_for('static', path='js/meetings.js') }}"></script>
 {% endblock %}

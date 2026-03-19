@@ -3,10 +3,13 @@
 {% block title %}Calendar - AI Meeting Scheduler{% endblock %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', path='css/calendar.css') }}">
+<!-- Flatpickr -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Tagify -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+<!-- FullCalendar -->
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-<script src="{{ url_for('static', path='js/calendar.js') }}"></script>
-
+<link rel="stylesheet" href="{{ url_for('static', path='css/calendar.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -55,21 +58,24 @@
             <i class="fa-regular fa-clock pop-row-icon"></i>
             <span class="pop-row-val" id="popTime">—</span>
         </div>
-        <div class="pop-row" id="popPlatformRow">
-            <i class="fa-solid fa-video pop-row-icon"></i>
-            <span class="pop-row-val" id="popPlatform">—</span>
+        <!-- Description row (replaces old platform row) -->
+        <div class="pop-row" id="popDescRow">
+            <i class="fa-solid fa-align-left pop-row-icon"></i>
+            <span class="pop-row-val" id="popDesc" style="font-weight:400;font-size:0.78rem;color:var(--slate-600);">—</span>
         </div>
         <div class="pop-row" id="popParticipantsRow">
             <i class="fa-solid fa-users pop-row-icon"></i>
             <span class="pop-row-val" id="popParticipants">—</span>
         </div>
-        <div class="pop-row" id="popLinkRow">
+        <!-- Link row hidden (field removed) -->
+        <div class="pop-row" id="popLinkRow" style="display:none;">
             <i class="fa-solid fa-link pop-row-icon"></i>
-            <span class="pop-row-val link" id="popLink" onclick="joinFromPop()">Join Meeting</span>
+            <span class="pop-row-val link" id="popLink"></span>
         </div>
     </div>
     <div class="pop-footer">
-        <button class="pop-btn primary" id="popJoinBtn" onclick="joinFromPop()">
+        <!-- Join button hidden (link removed) -->
+        <button class="pop-btn primary" id="popJoinBtn" style="display:none;">
             <i class="fa-solid fa-video"></i> Join
         </button>
         <button class="pop-btn" onclick="editFromPop()">
@@ -92,64 +98,75 @@
             <div class="modal-body">
                 <input type="hidden" id="calEditId">
 
+                <!-- Title -->
                 <div class="field-group">
                     <label class="field-label">Meeting Title</label>
                     <input type="text" class="field-input" id="calTitle" placeholder="e.g. Q3 Strategy Review">
                 </div>
 
-                <!-- Date + Color picker -->
+                <!-- Date — Flatpickr + color dots -->
                 <div class="form-inline-row">
                     <i class="fa-regular fa-calendar row-icon"></i>
-                    <input type="date" class="field-input" id="calDate" style="width:auto;flex:1;border-radius:10px;padding:7px 12px;font-size:0.84rem;font-weight:600;">
+                    <input id="calDate"
+                           class="field-input"
+                           placeholder="Pick a date"
+                           style="width:auto;flex:1;border-radius:10px;padding:7px 12px;font-size:0.84rem;font-weight:600;cursor:pointer;"
+                           readonly>
                     <div class="color-dots">
-                        <div class="color-dot cd-blue selected" onclick="selectCalColor(this,'blue')" title="Blue"></div>
-                        <div class="color-dot cd-green"          onclick="selectCalColor(this,'green')" title="Green"></div>
+                        <div class="color-dot cd-blue selected" onclick="selectCalColor(this,'blue')"   title="Blue"></div>
+                        <div class="color-dot cd-green"          onclick="selectCalColor(this,'green')"  title="Green"></div>
                         <div class="color-dot cd-purple"         onclick="selectCalColor(this,'purple')" title="Purple"></div>
-                        <div class="color-dot cd-amber"          onclick="selectCalColor(this,'amber')" title="Amber"></div>
+                        <div class="color-dot cd-amber"          onclick="selectCalColor(this,'amber')"  title="Amber"></div>
                     </div>
                 </div>
 
-                <!-- Time range -->
+                <!-- Time range — Flatpickr time pickers -->
                 <div class="form-inline-row" style="border-top:none;margin-top:-8px;">
                     <i class="fa-regular fa-clock row-icon"></i>
-                    <input type="time" class="form-time-input" id="calTimeStart" value="09:00">
+                    <input id="calTimeStart" class="form-time-input" placeholder="09:00" readonly style="cursor:pointer;">
                     <span class="arrow-sep">→</span>
-                    <input type="time" class="form-time-input" id="calTimeEnd" value="10:00">
+                    <input id="calTimeEnd"   class="form-time-input" placeholder="10:00" readonly style="cursor:pointer;">
                 </div>
 
-                <!-- Type + Platform -->
-                <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <label class="field-label">Type</label>
-                        <select class="field-input" id="calType" style="padding:9px 12px;">
-                            <option value="Internal">Internal</option>
-                            <option value="External">External</option>
-                            <option value="Recurring">Recurring</option>
-                            <option value="Review">Review</option>
-                        </select>
-                    </div>
-                    <div class="col-6">
-                        <label class="field-label">Platform</label>
-                        <select class="field-input" id="calPlatform" style="padding:9px 12px;">
-                            <option value="Google Meet">Google Meet</option>
-                            <option value="Zoom">Zoom</option>
-                            <option value="Teams">Microsoft Teams</option>
-                            <option value="Phone">Phone Call</option>
-                            <option value="In-person">In-person</option>
-                        </select>
-                    </div>
-                </div>
-
+                <!-- Timezone -->
                 <div class="field-group">
-                    <label class="field-label">Participants (comma-separated emails)</label>
-                    <input type="text" class="field-input" id="calParticipants" placeholder="alice@co.com, bob@co.com">
+                    <label class="field-label">Timezone</label>
+                    <select class="field-input" id="calTimezone" style="padding:9px 12px;">
+                        <option value="UTC">UTC</option>
+                        <option value="America/New_York">America/New_York (ET)</option>
+                        <option value="America/Chicago">America/Chicago (CT)</option>
+                        <option value="America/Denver">America/Denver (MT)</option>
+                        <option value="America/Los_Angeles">America/Los_Angeles (PT)</option>
+                        <option value="Europe/London">Europe/London (GMT)</option>
+                        <option value="Europe/Paris">Europe/Paris (CET)</option>
+                        <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+                        <option value="Asia/Tokyo">Asia/Tokyo (JST)</option>
+                        <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
+                    </select>
                 </div>
 
-                <div class="field-group mb-1">
-                    <label class="field-label">Meeting Link</label>
-                    <input type="text" class="field-input" id="calLink" placeholder="https://meet.google.com/...">
+                <!-- Participants — Tagify connected to contacts -->
+                <div class="field-group">
+                    <label class="field-label">Participants</label>
+                    <input type="text" id="calParticipants" class="field-input"
+                           placeholder="Type or pick email, press Enter or comma">
+                    <div style="font-size:0.7rem;color:var(--slate-400);margin-top:5px;">
+                        <i class="fa-solid fa-circle-info me-1"></i>
+                        Type an email and press <kbd style="background:var(--slate-100);border:1px solid var(--slate-200);border-radius:4px;padding:1px 5px;font-size:0.67rem;">Enter</kbd>
+                        or <kbd style="background:var(--slate-100);border:1px solid var(--slate-200);border-radius:4px;padding:1px 5px;font-size:0.67rem;">,</kbd>
+                        — or pick from contacts.
+                    </div>
                 </div>
-            </div>
+
+                <!-- Description -->
+                <div class="field-group mb-0">
+                    <label class="field-label">Description</label>
+                    <textarea class="field-input" id="calDescription"
+                              placeholder="Add agenda or notes..." rows="2"
+                              style="resize:vertical;min-height:70px;"></textarea>
+                </div>
+
+            </div><!-- /modal-body -->
             <div class="modal-footer justify-content-end gap-2">
                 <button class="cal-btn-cancel" data-bs-dismiss="modal">Cancel</button>
                 <button class="cal-btn-save" onclick="saveCalMeeting()">
@@ -180,4 +197,13 @@
 
 <!-- Toast stack -->
 <div class="cal-toast-stack" id="calToastStack"></div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<!-- Tagify JS -->
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.min.js"></script>
+<!-- Calendar page JS (includes FullCalendar init + modal logic) -->
+<script src="{{ url_for('static', path='js/calendar.js') }}"></script>
 {% endblock %}

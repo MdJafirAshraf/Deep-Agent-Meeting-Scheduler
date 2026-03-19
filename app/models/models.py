@@ -7,23 +7,24 @@ import datetime
 
 class Meeting(Base):
     __tablename__ = "meetings"
-
+ 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
-    type = Column(String, default="Internal")
-    platform = Column(String, default="Google Meet")
-    participants = Column(Text, default="")
+    description = Column(Text, default="")
     date = Column(String)
     time = Column(String)
+    timezone = Column(String, default="UTC")
+    start_datetime = Column(String, default="")
+    end_datetime = Column(String, default="")
     duration = Column(Integer, default=30)
-    link = Column(String, default="")
+    participants = Column(Text, default="")
+    reminders = Column(Text, default='{"useDefault": true, "overrides": []}')
     created_at = Column(String, default=lambda: datetime.datetime.now().isoformat())
     updated_at = Column(
         String,
         default=lambda: datetime.datetime.now().isoformat(),
         onupdate=lambda: datetime.datetime.now().isoformat(),
     )
-
 
 class Contact(Base):
     __tablename__ = "contacts"

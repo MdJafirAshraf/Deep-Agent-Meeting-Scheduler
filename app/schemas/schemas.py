@@ -9,24 +9,28 @@ class ChatMessage(BaseModel):
 
 class MeetingCreate(BaseModel):
     title: str
-    type: Optional[str] = "Internal"
-    platform: Optional[str] = "Google Meet"
-    participants: Optional[str] = ""
+    description: Optional[str] = ""
     date: str
     time: str
+    timezone: Optional[str] = "UTC"
+    start_datetime: Optional[str] = ""
+    end_datetime: Optional[str] = ""
     duration: Optional[int] = 30
-    link: Optional[str] = ""
-
-
+    participants: Optional[str] = ""
+    reminders: Optional[str] = '{"useDefault": true, "overrides": []}'
+ 
+ 
 class MeetingUpdate(BaseModel):
     title: Optional[str] = None
-    type: Optional[str] = None
-    platform: Optional[str] = None
-    participants: Optional[str] = None
+    description: Optional[str] = None
     date: Optional[str] = None
     time: Optional[str] = None
+    timezone: Optional[str] = None
+    start_datetime: Optional[str] = None
+    end_datetime: Optional[str] = None
     duration: Optional[int] = None
-    link: Optional[str] = None
+    participants: Optional[str] = None
+    reminders: Optional[str] = None
 
 
 class ContactCreate(BaseModel):

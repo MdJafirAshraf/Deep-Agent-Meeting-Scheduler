@@ -483,7 +483,45 @@
 .date-cell { font-weight: 700; color: var(--slate-700); font-size: 0.82rem; }
 .date-sub  { font-size: 0.68rem; color: var(--slate-400); margin-top: 2px; font-weight: 500; }
 
-.participant-avatars { display: flex; align-items: center; }
+/* ════════════════════════════════════════
+   Participant avatars — text-based circular
+   ════════════════════════════════════════ */
+
+/* Override old img-based .p-avatar — now using .p-avatar-text for spans */
+.participant-avatars {
+    display: flex;
+    align-items: center;
+}
+
+.p-avatar-text {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
+    margin-left: -6px;
+    cursor: default;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.15);
+    transition: transform .15s ease;
+    user-select: none;
+}
+
+.p-avatar-text:first-child {
+    margin-left: 0;
+}
+
+.participant-avatars:hover .p-avatar-text {
+    transform: translateX(-2px);
+}
+
 .p-avatar {
     width: 24px; height: 24px;
     border-radius: 50%;
