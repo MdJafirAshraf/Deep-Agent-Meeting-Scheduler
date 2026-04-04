@@ -357,7 +357,7 @@ function openAddModal() {
     document.getElementById('saveLabel').textContent      = 'Create Meeting';
     document.getElementById('fTitle').value               = '';
     document.getElementById('fDescription').value         = '';
-    document.getElementById('fTimezone').value            = 'UTC';
+    document.getElementById('fTimezone').value            = 'Asia/Kolkata';
 
     // Flatpickr resets
     fpDate.setDate(new Date(), true);

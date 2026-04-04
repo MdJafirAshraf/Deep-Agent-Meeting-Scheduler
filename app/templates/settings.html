@@ -50,13 +50,25 @@
                     </div>
                     <div>
                         <div class="tab-section-title">Personal Information</div>
-                        <div class="tab-section-desc">Update your name, email, and profile details</div>
+                        <div class="tab-section-desc">Update your name, email, and profile details. Changes are saved to the database immediately.</div>
+                    </div>
+                </div>
+
+                <!-- Loading skeleton shown while JS fetches the profile -->
+                <div id="profileLoading" style="display:none; margin-bottom:20px;">
+                    <div style="display:flex;gap:12px;align-items:center;padding:16px;
+                                background:var(--slate-50);border-radius:12px;border:1px solid var(--slate-100);">
+                        <div class="skeleton" style="width:52px;height:52px;border-radius:14px;flex-shrink:0;"></div>
+                        <div style="flex:1;">
+                            <div class="skeleton" style="width:40%;height:14px;border-radius:6px;margin-bottom:8px;"></div>
+                            <div class="skeleton" style="width:25%;height:11px;border-radius:6px;"></div>
+                        </div>
                     </div>
                 </div>
 
                 <form class="settings-form" id="detailsForm" onsubmit="saveDetails(event)">
 
-                    <!-- Avatar row -->
+                    <!-- Avatar row (visual only) -->
                     <div class="avatar-row">
                         <div class="avatar-preview">
                             <i class="fa-solid fa-user"></i>
@@ -72,32 +84,59 @@
 
                     <div class="form-grid-2">
                         <div class="field-group">
-                            <label class="field-label">First Name</label>
-                            <input type="text" class="field-input" id="firstName" placeholder="Enter first name" value="Alex">
+                            <label class="field-label" for="firstName">First Name</label>
+                            <input type="text"
+                                   class="field-input"
+                                   id="firstName"
+                                   name="first_name"
+                                   placeholder="Enter first name"
+                                   value="Alex"
+                                   autocomplete="given-name"
+                                   required>
                         </div>
                         <div class="field-group">
-                            <label class="field-label">Last Name</label>
-                            <input type="text" class="field-input" id="lastName" placeholder="Enter last name" value="Johnson">
+                            <label class="field-label" for="lastName">Last Name</label>
+                            <input type="text"
+                                   class="field-input"
+                                   id="lastName"
+                                   name="last_name"
+                                   placeholder="Enter last name"
+                                   value="Johnson"
+                                   autocomplete="family-name"
+                                   required>
                         </div>
                     </div>
 
                     <div class="field-group">
-                        <label class="field-label">Email Address</label>
+                        <label class="field-label" for="email">Email Address</label>
                         <div class="input-with-icon-wrap">
                             <i class="fa-regular fa-envelope input-icon"></i>
-                            <input type="email" class="field-input has-icon" id="email" placeholder="you@example.com" value="alex.johnson@company.com">
+                            <input type="email"
+                                   class="field-input has-icon"
+                                   id="email"
+                                   name="email"
+                                   placeholder="you@example.com"
+                                   value="alex.johnson@company.com"
+                                   autocomplete="email">
                         </div>
                     </div>
 
                     <div class="field-group">
-                        <label class="field-label">Display Name</label>
-                        <input type="text" class="field-input" id="displayName" placeholder="How you appear to others" value="Alex J.">
+                        <label class="field-label" for="displayName">Display Name</label>
+                        <input type="text"
+                               class="field-input"
+                               id="displayName"
+                               name="display_name"
+                               placeholder="How you appear to others"
+                               value="Alex J."
+                               autocomplete="nickname">
+                        <div class="field-hint">This is shown in meeting invites and chat messages.</div>
                     </div>
 
                     <div class="field-group">
-                        <label class="field-label">Timezone</label>
+                        <label class="field-label" for="timezone">Timezone</label>
                         <div class="select-wrap">
-                            <select class="field-input field-select" id="timezone">
+                            <select class="field-input field-select" id="timezone" name="timezone">
                                 <option value="UTC-8">Pacific Time (UTC-8)</option>
                                 <option value="UTC-7">Mountain Time (UTC-7)</option>
                                 <option value="UTC-6">Central Time (UTC-6)</option>
@@ -110,8 +149,17 @@
                         </div>
                     </div>
 
+                    <!-- Inline status message (hidden by default) -->
+                    <div id="detailsStatusMsg"
+                         style="display:none;padding:11px 14px;border-radius:10px;
+                                font-size:0.8rem;font-weight:600;margin-bottom:14px;">
+                    </div>
+
                     <div class="form-actions">
-                        <button type="button" class="btn-settings-cancel">Discard Changes</button>
+                        <!-- "Discard" wired in JS via event listener -->
+                        <button type="button" class="btn-settings-cancel">
+                            <i class="fa-solid fa-xmark"></i> Discard Changes
+                        </button>
                         <button type="submit" class="btn-settings-save">
                             <i class="fa-solid fa-floppy-disk"></i> Save Changes
                         </button>

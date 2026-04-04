@@ -42,7 +42,6 @@ class Contact(Base):
         onupdate=lambda: datetime.datetime.now().isoformat(),
     )
 
-
 class ChatMessage(Base):
     __tablename__ = "chat_history"
 
@@ -50,3 +49,18 @@ class ChatMessage(Base):
     role = Column(String)  # 'user' or 'assistant'
     content = Column(Text)
     timestamp = Column(String, default=lambda: datetime.datetime.now().isoformat())
+
+class UserProfile(Base):
+    __tablename__ = "user_profile"
+ 
+    id           = Column(Integer, primary_key=True, index=True)
+    first_name   = Column(String, default="Alex")
+    last_name    = Column(String, default="Johnson")
+    email        = Column(String, default="alex.johnson@company.com")
+    display_name = Column(String, default="Alex J.")
+    timezone     = Column(String, default="UTC-5")
+    updated_at   = Column(
+        String,
+        default=lambda: datetime.datetime.now().isoformat(),
+        onupdate=lambda: datetime.datetime.now().isoformat(),
+    )

@@ -4,6 +4,7 @@ from .schemas import (
     MeetingUpdate,
     ContactCreate,
     ContactUpdate,
+    UserProfileUpdate,
 )
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "MeetingUpdate",
     "ContactCreate",
     "ContactUpdate",
+    "UserProfileUpdate",
 ]

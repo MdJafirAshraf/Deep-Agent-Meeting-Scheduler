@@ -47,3 +47,11 @@ class ContactUpdate(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     notes: Optional[str] = None
+
+ 
+class UserProfileUpdate(BaseModel):
+    first_name: Optional[str] = None
+    last_name: Optional[str] = None
+    email: Optional[str] = None
+    display_name: Optional[str] = None
+    timezone: Optional[str] = None

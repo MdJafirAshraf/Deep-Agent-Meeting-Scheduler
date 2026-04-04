@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}?v=2.0">
     {% block head %}{% endblock %}
+
 </head>
 <body>
     <div class="app-shell">
@@ -56,15 +57,30 @@
                     </a>
                 </div>
 
-                <div class="user-profile-card">
-                    <div class="user-avatar-lg">
-                        <i class="fa-solid fa-user"></i>
+                <!-- User profile card — populated by JS -->
+                <a href="/settings" class="user-profile-card" style="text-decoration:none;" title="Edit profile">
+                    <!-- Avatar: shows initials once loaded, icon while loading -->
+                    <div class="user-avatar-lg" id="sidebarAvatar">
+                        <i class="fa-solid fa-user" id="sidebarAvatarIcon"></i>
                     </div>
-                    <div class="user-info">
-                        <span class="user-name">Alex Johnson</span>
-                        <span class="user-plan">Pro Account</span>
+
+                    <div class="user-info" style="min-width:0;">
+                        <!-- Name skeleton while fetching -->
+                        <span class="user-name" id="sidebarUserName">
+                            <span class="user-skeleton" id="sidebarNameSkeleton"
+                                  style="display:inline-block;width:90px;height:12px;vertical-align:middle;"></span>
+                        </span>
+                        <!-- Email row -->
+                        <span class="user-email" id="sidebarUserEmail">
+                            <span class="user-skeleton"
+                                  style="display:inline-block;width:120px;height:10px;vertical-align:middle;margin-top:3px;"></span>
+                        </span>
                     </div>
-                </div>
+
+                    <!-- Subtle arrow hint -->
+                    <i class="fa-solid fa-chevron-right"
+                       style="font-size:0.6rem;color:var(--slate-300);flex-shrink:0;margin-left:auto;"></i>
+                </a>
             </div>
         </aside>
 
@@ -140,6 +156,75 @@
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="{{ url_for('static', path='js/script.js') }}"></script>
+
+    <script>
+    /* ── Sidebar profile loader ───────────────────────────────────────────
+       Fetches /api/settings/profile once per page load and updates:
+         • Avatar initials (or falls back to icon)
+         • Full name
+         • Email address
+       Also exposes window.__userProfile so other scripts can read it.
+    ──────────────────────────────────────────────────────────────────── */
+    (function loadSidebarProfile() {
+
+        function getInitials(firstName, lastName) {
+            const f = (firstName || '').trim();
+            const l = (lastName  || '').trim();
+            return ((f[0] || '') + (l[0] || '')).toUpperCase() || '?';
+        }
+
+        function applyProfile(profile) {
+            // Cache on window for any page script that needs it
+            window.__userProfile = profile;
+
+            const nameEl   = document.getElementById('sidebarUserName');
+            const emailEl  = document.getElementById('sidebarUserEmail');
+            const avatarEl = document.getElementById('sidebarAvatar');
+            const iconEl   = document.getElementById('sidebarAvatarIcon');
+            const skelEl   = document.getElementById('sidebarNameSkeleton');
+
+            const fullName = [profile.first_name, profile.last_name]
+                                .filter(Boolean).join(' ') || 'User';
+            const email    = profile.email || '';
+            const initials = getInitials(profile.first_name, profile.last_name);
+
+            // ── Name ──
+            if (nameEl) {
+                nameEl.textContent = fullName;   // replaces skeleton span too
+            }
+
+            // ── Email ──
+            if (emailEl) {
+                emailEl.textContent = email;
+            }
+
+            // ── Avatar: swap icon for initials ──
+            if (avatarEl && iconEl) {
+                iconEl.remove();                  // remove the <i> icon
+                avatarEl.textContent = initials;  // replace with letters
+            }
+        }
+
+        function showFallback() {
+            // If fetch fails just show static defaults so the UI isn't broken
+            const nameEl  = document.getElementById('sidebarUserName');
+            const emailEl = document.getElementById('sidebarUserEmail');
+            const skelEl  = document.getElementById('sidebarNameSkeleton');
+            if (nameEl)  nameEl.textContent  = 'Alex Johnson';
+            if (emailEl) emailEl.textContent = '';
+            if (skelEl)  skelEl.remove();
+        }
+
+        fetch('/api/settings/profile')
+            .then(r => {
+                if (!r.ok) throw new Error('profile fetch failed');
+                return r.json();
+            })
+            .then(data => applyProfile(data.profile))
+            .catch(() => showFallback());
+    })();
+    </script>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>

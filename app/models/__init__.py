@@ -1,3 +1,3 @@
-from .models import Meeting, Contact, ChatMessage
+from .models import Meeting, Contact, ChatMessage, UserProfile
 
-__all__ = ["Meeting", "Contact", "ChatMessage"]
+__all__ = ["Meeting", "Contact", "ChatMessage", "UserProfile"]

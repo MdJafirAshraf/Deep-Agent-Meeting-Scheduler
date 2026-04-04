@@ -265,6 +265,39 @@ body {
     gap: 0;
 }
 
+/* ── Sidebar user card dynamic states ── */
+.user-profile-card .user-avatar-lg {
+    background: linear-gradient(135deg, #fbbf24, #f97316);
+    color: white;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
+}
+.user-profile-card .user-email {
+    font-size: 0.66rem;
+    color: var(--slate-400);
+    font-weight: 500;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+/* Skeleton pulse while loading */
+.user-skeleton {
+    background: linear-gradient(90deg,
+        var(--slate-100) 25%,
+        var(--slate-150) 50%,
+        var(--slate-100) 75%);
+    background-size: 200% 100%;
+    border-radius: 6px;
+    animation: skeletonShimmer 1.5s ease-in-out infinite;
+}
+@keyframes skeletonShimmer {
+    to { background-position: -200% 0; }
+}
+
 .user-profile-card {
     display: flex;
     align-items: center;
